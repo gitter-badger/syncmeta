@@ -3,3 +3,4 @@
 .project
 .dbis.secret.json
 .localGruntConfig.json
+/html/widgets/
