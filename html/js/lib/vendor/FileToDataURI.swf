@@ -7,6 +7,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="width=1020">
     
     
     <title>FileToDataURI/FileToDataURI.swf at master · Aymkdn/FileToDataURI · GitHub</title>
@@ -30,31 +31,33 @@
     <meta name="msapplication-TileImage" content="/windows-tile.png">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="selected-link" value="repo_source" data-pjax-transient>
-      <meta name="google-analytics" content="UA-3769691-2">
 
-    <meta content="collector.githubapp.com" name="octolytics-host" /><meta content="collector-cdn.github.com" name="octolytics-script-host" /><meta content="github" name="octolytics-app-id" /><meta content="4D0B4F83:7AFD:387FA83:556D6112" name="octolytics-dimension-request_id" />
+    <meta name="google-site-verification" content="KT5gs8h0wvaagLKAVWq8bbeNwnZZK1r1XQysX3xurLU">
+        <meta name="google-analytics" content="UA-3769691-2">
+
+    <meta content="collector.githubapp.com" name="octolytics-host" /><meta content="collector-cdn.github.com" name="octolytics-script-host" /><meta content="github" name="octolytics-app-id" /><meta content="863D42CA:4F95:70C0EE:55F0054A" name="octolytics-dimension-request_id" />
     
-    <meta content="Rails, view, blob#show" name="analytics-event" />
+    <meta content="Rails, view, blob#show" data-pjax-transient="true" name="analytics-event" />
     <meta class="js-ga-set" name="dimension1" content="Logged Out">
-    <meta class="js-ga-set" name="dimension2" content="Header v3">
+      <meta class="js-ga-set" name="dimension4" content="Current repo nav">
     <meta name="is-dotcom" content="true">
-      <meta name="hostname" content="github.com">
+        <meta name="hostname" content="github.com">
     <meta name="user-login" content="">
 
-    
-    <link rel="icon" type="image/x-icon" href="https://assets-cdn.github.com/favicon.ico">
+      <link rel="mask-icon" href="https://assets-cdn.github.com/pinned-octocat.svg" color="#4078c0">
+      <link rel="icon" type="image/x-icon" href="https://assets-cdn.github.com/favicon.ico">
 
-
-    <meta content="authenticity_token" name="csrf-param" />
-<meta content="IR2Uc4GKv+MGXiebqclWm9Uihpyrm7bLwid1BcVV9zduECjCKEmiLV9aeWwB5hrKxIphpcsn8ZTzMMczC4h7Bw==" name="csrf-token" />
-
-    <link href="https://assets-cdn.github.com/assets/github/index-ab5a4b6368c51838f7b3c1651512096c6332db5873f2e0247cbae17e7d5c839d.css" media="all" rel="stylesheet" />
-    <link href="https://assets-cdn.github.com/assets/github2/index-07675b8de05c686906f7c0541890ed00c96acbae7d2c8a7541f19614f706a106.css" media="all" rel="stylesheet" />
-    
+    <!-- </textarea> --><!-- '"` --><meta content="authenticity_token" name="csrf-param" />
+<meta content="WUvLqo+Nmnwp5JB8dbvWrqco3tCyIGKNdwfn5ycYOZnPNwhK2I4hRJa7RppCdJ6fcU/lgJTHgn3UDT4hmjf4FA==" name="csrf-token" />
     
 
+    <link crossorigin="anonymous" href="https://assets-cdn.github.com/assets/github-297f62b515917a9f8880b23160a0cb5073573d140c9fa1b8c36c54eef056537d.css" media="all" rel="stylesheet" />
+    <link crossorigin="anonymous" href="https://assets-cdn.github.com/assets/github2-ada15c437f3f84dd62f6fa41cd5edd0a378938da05e9ea81b1150c4cd740ebaf.css" media="all" rel="stylesheet" />
+    
+    
 
-    <meta http-equiv="x-pjax-version" content="bb7158a25d774c266b3755c065bc7c98">
+
+    <meta http-equiv="x-pjax-version" content="84ca538bfa5cf2c854717ee8112ab1d2">
 
       
   <meta name="description" content="FileToDataURI - A cross-browser solution to read a local file and provide the base64 encoded content">
@@ -68,14 +71,15 @@
 
   <body class="logged_out  env-production  vis-public page-blob">
     <a href="#start-of-content" tabindex="1" class="accessibility-aid js-skip-to-content">Skip to content</a>
-    <div class="wrapper">
-      
-      
-      
+
+    
+    
+    
 
 
-        
-        <div class="header header-logged-out" role="banner">
+
+      
+      <div class="header header-logged-out" role="banner">
   <div class="container clearfix">
 
     <a class="header-logo-wordmark" href="https://github.com/" data-ga-click="(Logged out) Header, go to homepage, icon:logo-wordmark">
@@ -88,7 +92,7 @@
     </div>
 
     <div class="site-search repo-scope js-site-search" role="search">
-      <form accept-charset="UTF-8" action="/Aymkdn/FileToDataURI/search" class="js-site-search-form" data-global-search-url="/search" data-repo-search-url="/Aymkdn/FileToDataURI/search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+      <!-- </textarea> --><!-- '"` --><form accept-charset="UTF-8" action="/Aymkdn/FileToDataURI/search" class="js-site-search-form" data-global-search-url="/search" data-repo-search-url="/Aymkdn/FileToDataURI/search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
   <label class="js-chromeless-input-container form-control">
     <div class="scope-badge">This repository</div>
     <input type="text"
@@ -96,6 +100,7 @@
       data-hotkey="s"
       name="q"
       placeholder="Search"
+      aria-label="Search this repository"
       data-global-scope-placeholder="Search GitHub"
       data-repo-scope-placeholder="Search"
       tabindex="1"
@@ -115,7 +120,7 @@
             <a class="header-nav-link" href="https://enterprise.github.com/" data-ga-click="(Logged out) Header, go to enterprise, text:enterprise">Enterprise</a>
           </li>
           <li class="header-nav-item">
-            <a class="header-nav-link" href="/blog" data-ga-click="(Logged out) Header, go to blog, text:blog">Blog</a>
+            <a class="header-nav-link" href="/pricing" data-ga-click="(Logged out) Header, go to pricing, text:pricing">Pricing</a>
           </li>
       </ul>
 
@@ -124,15 +129,18 @@
 
 
 
-      <div id="start-of-content" class="accessibility-aid"></div>
-          <div class="site" itemscope itemtype="http://schema.org/WebPage">
+    <div id="start-of-content" class="accessibility-aid"></div>
+
     <div id="js-flash-container">
-      
-    </div>
+</div>
+
+
+        <div itemscope itemtype="http://schema.org/WebPage">
     <div class="pagehead repohead instapaper_ignore readability-menu">
       <div class="container">
 
-        
+        <div class="clearfix">
+          
 <ul class="pagehead-actions">
 
   <li>
@@ -157,7 +165,7 @@
   </a>
 
     <a class="social-count js-social-count" href="/Aymkdn/FileToDataURI/stargazers">
-      18
+      19
     </a>
 
   </li>
@@ -175,47 +183,49 @@
     </li>
 </ul>
 
-        <h1 itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="entry-title public">
-          <span class="mega-octicon octicon-repo"></span>
-          <span class="author"><a href="/Aymkdn" class="url fn" itemprop="url" rel="author"><span itemprop="title">Aymkdn</span></a></span><!--
-       --><span class="path-divider">/</span><!--
-       --><strong><a href="/Aymkdn/FileToDataURI" data-pjax="#js-repo-pjax-container">FileToDataURI</a></strong>
+          <h1 itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="entry-title public ">
+  <span class="mega-octicon octicon-repo"></span>
+  <span class="author"><a href="/Aymkdn" class="url fn" itemprop="url" rel="author"><span itemprop="title">Aymkdn</span></a></span><!--
+--><span class="path-divider">/</span><!--
+--><strong><a href="/Aymkdn/FileToDataURI" data-pjax="#js-repo-pjax-container">FileToDataURI</a></strong>
 
-          <span class="page-context-loader">
-            <img alt="" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
-          </span>
+  <span class="page-context-loader">
+    <img alt="" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif" width="16" />
+  </span>
 
-        </h1>
-      </div><!-- /.container -->
-    </div><!-- /.repohead -->
+</h1>
+
+        </div>
+      </div>
+    </div>
 
     <div class="container">
-      <div class="repository-with-sidebar repo-container new-discussion-timeline  ">
+      <div class="repository-with-sidebar repo-container new-discussion-timeline ">
         <div class="repository-sidebar clearfix">
-            
+          
 <nav class="sunken-menu repo-nav js-repo-nav js-sidenav-container-pjax js-octicon-loaders"
      role="navigation"
      data-pjax="#js-repo-pjax-container"
      data-issue-count-url="/Aymkdn/FileToDataURI/issues/counts">
   <ul class="sunken-menu-group">
     <li class="tooltipped tooltipped-w" aria-label="Code">
-      <a href="/Aymkdn/FileToDataURI" aria-label="Code" class="selected js-selected-navigation-item sunken-menu-item" data-hotkey="g c" data-selected-links="repo_source repo_downloads repo_commits repo_releases repo_tags repo_branches /Aymkdn/FileToDataURI">
+      <a href="/Aymkdn/FileToDataURI" aria-label="Code" aria-selected="true" class="js-selected-navigation-item selected sunken-menu-item" data-hotkey="g c" data-selected-links="repo_source repo_downloads repo_commits repo_releases repo_tags repo_branches /Aymkdn/FileToDataURI">
         <span class="octicon octicon-code"></span> <span class="full-word">Code</span>
-        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif" width="16" />
 </a>    </li>
 
       <li class="tooltipped tooltipped-w" aria-label="Issues">
         <a href="/Aymkdn/FileToDataURI/issues" aria-label="Issues" class="js-selected-navigation-item sunken-menu-item" data-hotkey="g i" data-selected-links="repo_issues repo_labels repo_milestones /Aymkdn/FileToDataURI/issues">
           <span class="octicon octicon-issue-opened"></span> <span class="full-word">Issues</span>
           <span class="js-issue-replace-counter"></span>
-          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif" width="16" />
 </a>      </li>
 
     <li class="tooltipped tooltipped-w" aria-label="Pull requests">
       <a href="/Aymkdn/FileToDataURI/pulls" aria-label="Pull requests" class="js-selected-navigation-item sunken-menu-item" data-hotkey="g p" data-selected-links="repo_pulls /Aymkdn/FileToDataURI/pulls">
           <span class="octicon octicon-git-pull-request"></span> <span class="full-word">Pull requests</span>
           <span class="js-pull-replace-counter"></span>
-          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif" width="16" />
 </a>    </li>
 
   </ul>
@@ -225,27 +235,27 @@
     <li class="tooltipped tooltipped-w" aria-label="Pulse">
       <a href="/Aymkdn/FileToDataURI/pulse" aria-label="Pulse" class="js-selected-navigation-item sunken-menu-item" data-selected-links="pulse /Aymkdn/FileToDataURI/pulse">
         <span class="octicon octicon-pulse"></span> <span class="full-word">Pulse</span>
-        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif" width="16" />
 </a>    </li>
 
     <li class="tooltipped tooltipped-w" aria-label="Graphs">
       <a href="/Aymkdn/FileToDataURI/graphs" aria-label="Graphs" class="js-selected-navigation-item sunken-menu-item" data-selected-links="repo_graphs repo_contributors /Aymkdn/FileToDataURI/graphs">
         <span class="octicon octicon-graph"></span> <span class="full-word">Graphs</span>
-        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif" width="16" />
 </a>    </li>
   </ul>
 
 
 </nav>
 
-              <div class="only-with-full-nav">
-                  
+            <div class="only-with-full-nav">
+                
 <div class="js-clone-url clone-url open"
   data-protocol-type="http">
   <h3><span class="text-emphasized">HTTPS</span> clone URL</h3>
   <div class="input-group js-zeroclipboard-container">
     <input type="text" class="input-mini input-monospace js-url-field js-zeroclipboard-target"
-           value="https://github.com/Aymkdn/FileToDataURI.git" readonly="readonly">
+           value="https://github.com/Aymkdn/FileToDataURI.git" readonly="readonly" aria-label="HTTPS clone URL">
     <span class="input-group-button">
       <button aria-label="Copy to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
     </span>
@@ -258,7 +268,7 @@
   <h3><span class="text-emphasized">Subversion</span> checkout URL</h3>
   <div class="input-group js-zeroclipboard-container">
     <input type="text" class="input-mini input-monospace js-url-field js-zeroclipboard-target"
-           value="https://github.com/Aymkdn/FileToDataURI" readonly="readonly">
+           value="https://github.com/Aymkdn/FileToDataURI" readonly="readonly" aria-label="Subversion checkout URL">
     <span class="input-group-button">
       <button aria-label="Copy to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
     </span>
@@ -267,27 +277,23 @@
 
 
 
-<div class="clone-options">You can clone with
-  <form accept-charset="UTF-8" action="/users/set_protocol?protocol_selector=http&amp;protocol_type=clone" class="inline-form js-clone-selector-form " data-remote="true" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="79ZBXPPnqPIXC+vZtbVU8DsWfVHBfklyH3cgdTmhXNYOU7L3fQU8IwP7rcnHehVwreyFwxCU/MXznXydMA9dMg==" /></div><button class="btn-link js-clone-selector" data-protocol="http" type="submit">HTTPS</button></form> or <form accept-charset="UTF-8" action="/users/set_protocol?protocol_selector=subversion&amp;protocol_type=clone" class="inline-form js-clone-selector-form " data-remote="true" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="vheVk7duPkhlj6ggaA9G2Of0ggMAJtXT2RPm6K8ErjeUqh/AUx2KRsqn5ISFq1wQDAEn0KmcfcWOQP9cIlFSfA==" /></div><button class="btn-link js-clone-selector" data-protocol="subversion" type="submit">Subversion</button></form>.
-  <a href="https://help.github.com/articles/which-remote-url-should-i-use" class="help tooltipped tooltipped-n" aria-label="Get help on which URL is right for you.">
-    <span class="octicon octicon-question"></span>
-  </a>
-</div>
+  <div class="clone-options">You can clone with
+    <!-- </textarea> --><!-- '"` --><form accept-charset="UTF-8" action="/users/set_protocol?protocol_selector=http&amp;protocol_type=clone" class="inline-form js-clone-selector-form " data-form-nonce="2bb29071daf27b145d18797303e7dd734a4238db" data-remote="true" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="FhAUCOMjRRpE3lW/8fK3uYDnd0SyLR0B310MJS9EVfAoRl+jyJWlKhd2evuJAnbKghr0rNgRtlWJG3qKZ7/nJw==" /></div><button class="btn-link js-clone-selector" data-protocol="http" type="submit">HTTPS</button></form> or <!-- </textarea> --><!-- '"` --><form accept-charset="UTF-8" action="/users/set_protocol?protocol_selector=subversion&amp;protocol_type=clone" class="inline-form js-clone-selector-form " data-form-nonce="2bb29071daf27b145d18797303e7dd734a4238db" data-remote="true" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="8FcC7/d4kcDKaW2YSbtZacolFPx1C9Xw4tF254e21r967RK113rVdgIZrQtzZQHT+jalZRpLgB/znh4iQbWl/g==" /></div><button class="btn-link js-clone-selector" data-protocol="subversion" type="submit">Subversion</button></form>.
+    <a href="https://help.github.com/articles/which-remote-url-should-i-use" class="help tooltipped tooltipped-n" aria-label="Get help on which URL is right for you.">
+      <span class="octicon octicon-question"></span>
+    </a>
+  </div>
 
-
-
-
-                <a href="/Aymkdn/FileToDataURI/archive/master.zip"
-                   class="btn btn-sm sidebar-button"
-                   aria-label="Download the contents of Aymkdn/FileToDataURI as a zip file"
-                   title="Download the contents of Aymkdn/FileToDataURI as a zip file"
-                   rel="nofollow">
-                  <span class="octicon octicon-cloud-download"></span>
-                  Download ZIP
-                </a>
-              </div>
-        </div><!-- /.repository-sidebar -->
-
+              <a href="/Aymkdn/FileToDataURI/archive/master.zip"
+                 class="btn btn-sm sidebar-button"
+                 aria-label="Download the contents of Aymkdn/FileToDataURI as a zip file"
+                 title="Download the contents of Aymkdn/FileToDataURI as a zip file"
+                 rel="nofollow">
+                <span class="octicon octicon-cloud-download"></span>
+                Download ZIP
+              </a>
+            </div>
+        </div>
         <div id="js-repo-pjax-container" class="repository-content context-loader-container" data-pjax-container>
 
           
@@ -296,15 +302,14 @@
 
 <!-- blob contrib key: blob_contributors:v21:7042a19b8ef27469d8d48c6e0f515870 -->
 
-<div class="file-navigation js-zeroclipboard-container">
-  
+  <div class="file-navigation js-zeroclipboard-container">
+    
 <div class="select-menu js-menu-container js-select-menu left">
   <span class="btn btn-sm select-menu-button js-menu-target css-truncate" data-hotkey="w"
     data-ref="master"
     title="master"
     role="button" aria-label="Switch branches or tags" tabindex="0" aria-haspopup="true">
-    <span class="octicon octicon-git-branch"></span>
-    <i>branch:</i>
+    <i>Branch:</i>
     <span class="js-select-button css-truncate-target">master</span>
   </span>
 
@@ -323,16 +328,16 @@
         <div class="select-menu-tabs">
           <ul>
             <li class="select-menu-tab">
-              <a href="#" data-tab-filter="branches" data-filter-placeholder="Filter branches/tags" class="js-select-menu-tab">Branches</a>
+              <a href="#" data-tab-filter="branches" data-filter-placeholder="Filter branches/tags" class="js-select-menu-tab" role="tab">Branches</a>
             </li>
             <li class="select-menu-tab">
-              <a href="#" data-tab-filter="tags" data-filter-placeholder="Find a tag…" class="js-select-menu-tab">Tags</a>
+              <a href="#" data-tab-filter="tags" data-filter-placeholder="Find a tag…" class="js-select-menu-tab" role="tab">Tags</a>
             </li>
           </ul>
         </div>
       </div>
 
-      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="branches">
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="branches" role="menu">
 
         <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
 
@@ -375,53 +380,32 @@
   </div>
 </div>
 
-  <div class="btn-group right">
-    <a href="/Aymkdn/FileToDataURI/find/master"
-          class="js-show-file-finder btn btn-sm empty-icon tooltipped tooltipped-s"
-          data-pjax
-          data-hotkey="t"
-          aria-label="Quickly jump between files">
-      <span class="octicon octicon-list-unordered"></span>
-    </a>
-    <button aria-label="Copy file path to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
-  </div>
-
-  <div class="breadcrumb js-zeroclipboard-target">
-    <span class='repo-root js-repo-root'><span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="/Aymkdn/FileToDataURI" class="" data-branch="master" data-pjax="true" itemscope="url"><span itemprop="title">FileToDataURI</span></a></span></span><span class="separator">/</span><strong class="final-path">FileToDataURI.swf</strong>
-  </div>
-</div>
-
-
-  <div class="commit file-history-tease">
-    <div class="file-history-tease-header">
-        <img alt="@Aymkdn" class="avatar" data-user="946315" height="24" src="https://avatars3.githubusercontent.com/u/946315?v=3&amp;s=48" width="24" />
-        <span class="author"><a href="/Aymkdn" rel="author">Aymkdn</a></span>
-        <time datetime="2014-12-25T11:59:40Z" is="relative-time">Dec 25, 2014</time>
-        <div class="commit-title">
-            <a href="/Aymkdn/FileToDataURI/commit/7c1d8a34a312ff3a87fdfffd55be0af783cd205f" class="message" data-pjax="true" title="Remove fileName because that doesn&#39;t work good">Remove fileName because that doesn't work good</a>
-        </div>
+    <div class="btn-group right">
+      <a href="/Aymkdn/FileToDataURI/find/master"
+            class="js-show-file-finder btn btn-sm empty-icon tooltipped tooltipped-nw"
+            data-pjax
+            data-hotkey="t"
+            aria-label="Quickly jump between files">
+        <span class="octicon octicon-list-unordered"></span>
+      </a>
+      <button aria-label="Copy file path to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
     </div>
 
-    <div class="participation">
-      <p class="quickstat">
-        <a href="#blob_contributors_box" rel="facebox">
-          <strong>1</strong>
-           contributor
-        </a>
-      </p>
-      
-    </div>
-    <div id="blob_contributors_box" style="display:none">
-      <h2 class="facebox-header">Users who have contributed to this file</h2>
-      <ul class="facebox-user-list">
-          <li class="facebox-user-list-item">
-            <img alt="@Aymkdn" data-user="946315" height="24" src="https://avatars3.githubusercontent.com/u/946315?v=3&amp;s=48" width="24" />
-            <a href="/Aymkdn">Aymkdn</a>
-          </li>
-      </ul>
+    <div class="breadcrumb js-zeroclipboard-target">
+      <span class="repo-root js-repo-root"><span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="/Aymkdn/FileToDataURI" class="" data-branch="master" data-pjax="true" itemscope="url"><span itemprop="title">FileToDataURI</span></a></span></span><span class="separator">/</span><strong class="final-path">FileToDataURI.swf</strong>
     </div>
   </div>
 
+<include-fragment class="commit commit-loader file-history-tease" src="/Aymkdn/FileToDataURI/contributors/master/FileToDataURI.swf">
+  <div class="file-history-tease-header">
+    Fetching contributors&hellip;
+  </div>
+
+  <div class="participation">
+    <p class="loader-loading"><img alt="" height="16" src="https://assets-cdn.github.com/images/spinners/octocat-spinner-32-EAF2F5.gif" width="16" /></p>
+    <p class="loader-error">Cannot retrieve contributors at this time</p>
+  </div>
+</include-fragment>
 <div class="file">
   <div class="file-header">
     <div class="file-actions">
@@ -439,10 +423,11 @@
     </div>
 
     <div class="file-info">
-      44.309 kb
+      44.309 kB
     </div>
   </div>
   
+
   <div class="blob-wrapper data type-text">
       <div class="image">
           <a href="/Aymkdn/FileToDataURI/blob/master/FileToDataURI.swf?raw=true">View Raw</a>
@@ -453,20 +438,18 @@
 
 <a href="#jump-to-line" rel="facebox[.linejump]" data-hotkey="l" style="display:none">Jump to Line</a>
 <div id="jump-to-line" style="display:none">
-  <form accept-charset="UTF-8" action="" class="js-jump-to-line-form" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
-    <input class="linejump-input js-jump-to-line-field" type="text" placeholder="Jump to line&hellip;" autofocus>
+  <!-- </textarea> --><!-- '"` --><form accept-charset="UTF-8" action="" class="js-jump-to-line-form" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+    <input class="linejump-input js-jump-to-line-field" type="text" placeholder="Jump to line&hellip;" aria-label="Jump to line" autofocus>
     <button type="submit" class="btn">Go</button>
 </form></div>
 
         </div>
-
-      </div><!-- /.repo-container -->
+      </div>
       <div class="modal-backdrop"></div>
-    </div><!-- /.container -->
-  </div><!-- /.site -->
+    </div>
+  </div>
 
 
-    </div><!-- /.wrapper -->
 
       <div class="container">
   <div class="site-footer" role="contentinfo">
@@ -477,6 +460,7 @@
       <li><a href="https://shop.github.com" data-ga-click="Footer, go to shop, text:shop">Shop</a></li>
         <li><a href="https://github.com/blog" data-ga-click="Footer, go to blog, text:blog">Blog</a></li>
         <li><a href="https://github.com/about" data-ga-click="Footer, go to about, text:about">About</a></li>
+        <li><a href="https://github.com/pricing" data-ga-click="Footer, go to pricing, text:pricing">Pricing</a></li>
 
     </ul>
 
@@ -484,51 +468,39 @@
       <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
 </a>
     <ul class="site-footer-links">
-      <li>&copy; 2015 <span title="0.02840s from github-fe124-cp1-prd.iad.github.net">GitHub</span>, Inc.</li>
+      <li>&copy; 2015 <span title="0.06961s from github-fe132-cp1-prd.iad.github.net">GitHub</span>, Inc.</li>
         <li><a href="https://github.com/site/terms" data-ga-click="Footer, go to terms, text:terms">Terms</a></li>
         <li><a href="https://github.com/site/privacy" data-ga-click="Footer, go to privacy, text:privacy">Privacy</a></li>
         <li><a href="https://github.com/security" data-ga-click="Footer, go to security, text:security">Security</a></li>
         <li><a href="https://github.com/contact" data-ga-click="Footer, go to contact, text:contact">Contact</a></li>
+        <li><a href="https://help.github.com" data-ga-click="Footer, go to help, text:help">Help</a></li>
     </ul>
-  </div>
-</div>
-
-
-    <div class="fullscreen-overlay js-fullscreen-overlay" id="fullscreen_overlay">
-  <div class="fullscreen-container js-suggester-container">
-    <div class="textarea-wrap">
-      <textarea name="fullscreen-contents" id="fullscreen-contents" class="fullscreen-contents js-fullscreen-contents" placeholder=""></textarea>
-      <div class="suggester-container">
-        <div class="suggester fullscreen-suggester js-suggester js-navigation-container"></div>
-      </div>
-    </div>
-  </div>
-  <div class="fullscreen-sidebar">
-    <a href="#" class="exit-fullscreen js-exit-fullscreen tooltipped tooltipped-w" aria-label="Exit Zen Mode">
-      <span class="mega-octicon octicon-screen-normal"></span>
-    </a>
-    <a href="#" class="theme-switcher js-theme-switcher tooltipped tooltipped-w"
-      aria-label="Switch themes">
-      <span class="octicon octicon-color-mode"></span>
-    </a>
   </div>
 </div>
 
 
 
     
+    
 
     <div id="ajax-error-message" class="flash flash-error">
       <span class="octicon octicon-alert"></span>
-      <a href="#" class="octicon octicon-x flash-close js-ajax-error-dismiss" aria-label="Dismiss error"></a>
+      <button type="button" class="flash-close js-flash-close js-ajax-error-dismiss" aria-label="Dismiss error">
+        <span class="octicon octicon-x"></span>
+      </button>
       Something went wrong with that request. Please try again.
     </div>
 
 
-      <script crossorigin="anonymous" src="https://assets-cdn.github.com/assets/frameworks-447ce66a36506ebddc8e84b4e32a77f6062f3d3482e77dd21a77a01f0643ad98.js"></script>
-      <script async="async" crossorigin="anonymous" src="https://assets-cdn.github.com/assets/github/index-83be60956d0d00076a726f0864b49916aae8e7bc6ee140798791be0b6644d661.js"></script>
+      <script crossorigin="anonymous" src="https://assets-cdn.github.com/assets/frameworks-06e65f5639cc52d1aaada53115a54614b60fa90ab446a673e3e1818df167663b.js"></script>
+      <script async="async" crossorigin="anonymous" src="https://assets-cdn.github.com/assets/github-6486b386f2ea8e61e35e6f68b6e5506fa17aed1c385b528ece57088cf14a1459.js"></script>
       
       
+    <div class="js-stale-session-flash stale-session-flash flash flash-warn flash-banner hidden">
+      <span class="octicon octicon-alert"></span>
+      <span class="signed-in-tab-flash">You signed in with another tab or window. <a href="">Reload</a> to refresh your session.</span>
+      <span class="signed-out-tab-flash">You signed out in another tab or window. <a href="">Reload</a> to refresh your session.</span>
+    </div>
   </body>
 </html>
 
