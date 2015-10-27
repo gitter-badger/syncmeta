@@ -14,6 +14,7 @@ define([
 
     AbstractEdge.prototype = new AbstractEntity();
     AbstractEdge.prototype.constructor = AbstractEdge;
+
     /**
      * AbstractEdge
      * @class canvas_widget.AbstractEdge
@@ -143,8 +144,6 @@ define([
             }
         };
 
-
-
         /**
          * Callback for a remote Entity Select Operation
          * @param {operations.non_ot.EntitySelectOperation} operation
@@ -220,11 +219,26 @@ define([
             return $e;
         };
 
-
         /**
          * Default paint style of edge
          */
         var _defaultPaintStyle;
+
+        /**
+         * Set the default paint style
+         * @param paintStyle
+         */
+        this.setDefaultPaintStyle = function(paintStyle){
+            _defaultPaintStyle = paintStyle;
+        };
+
+        /**
+         * Get the default paint style
+         * @returns {*}
+         */
+        this.getDefaultPaintStyle = function(){
+            return _defaultPaintStyle;
+        };
 
         /**
          * Send NodeDeleteOperation for node
@@ -406,7 +420,7 @@ define([
 
         //noinspection JSUnusedGlobalSymbols
         /**
-         * Set jsPlumb object representing the edge
+         * Get jsPlumb object representing the edge
          * @return {Object} jsPlumbConnection
          */
         this.getJsPlumbConnection = function(){

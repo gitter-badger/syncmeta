@@ -80,7 +80,7 @@ define([
                         resOperation = new SetViewTypesOperation(data.flag);
                         break;
                     case InitModelTypesOperation.TYPE:
-                        resOperation = new InitModelTypesOperation(data.vls);
+                        resOperation = new InitModelTypesOperation(data.vls, data.startViewGeneration);
                         break;
                     case ViewInitOperation.TYPE:
                         resOperation = new ViewInitOperation(data.data, data.viewpoint);
@@ -141,9 +141,8 @@ define([
                                                 value.height,
                                                 value.zIndex,
                                                 value.json,
-                                                value.toCanvas,
                                                 value.viewId,
-                                                value.origin
+                                                value.oType
                                             );
                                             break;
                                         case CONFIG.OPERATION.TYPE.UPDATE:
@@ -197,7 +196,7 @@ define([
                                         value.target,
                                         value.json,
                                         value.viewId,
-                                        value.origin
+                                        value.oType
                                     );
                                     break;
                                 case CONFIG.OPERATION.TYPE.UPDATE:

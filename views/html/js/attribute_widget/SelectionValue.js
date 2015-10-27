@@ -6,8 +6,8 @@ define([
 		'Util',
 		'attribute_widget/AbstractValue',
 		'operations/ot/ValueChangeOperation',
-		'viewcanvas_widget/LogicalOperator',
-		'viewcanvas_widget/LogicalConjunctions',
+		'canvas_widget/LogicalOperator',
+		'canvas_widget/LogicalConjunctions',
         'attribute_widget/ClosedViewGeneration',
 		'text!templates/attribute_widget/selection_value.html'
 	], /** @lends SelectionValue */
@@ -78,15 +78,13 @@ define([
                 if(operation.getValue() === 'empty'){
                     EntityManager.deleteFromMap(viewType.getViewId(), viewType.getEntityId());
                     deleteCvgOp = new DeleteCvgOperation(_(viewType.getNeighbors()).keys().value());
-                    _iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.VIEWCANVAS, deleteCvgOp.toNonOTOperation());
+                    _iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.MAIN, deleteCvgOp.toNonOTOperation());
                     return;
                 }
                 var  node = EntityManager.find(operation.getValue());
                 var op = null;
                 var attr = null;
                 if (node) {
-                    _iwc.enableBuffer();
-                    _iwc.setBufferedMessagesReceiver(CONFIG.WIDGET.NAME.VIEWCANVAS);
                     var viewTypeAttribute = viewType.getAttributes()["[attributes]"];
                     var viewTypeAttrList = viewTypeAttribute.getAttributes();
                     var attributeList = null;
@@ -97,10 +95,12 @@ define([
                             if (viewTypeAttrList.hasOwnProperty(key1)) {
                                 attr = viewTypeAttrList[key1];
                                 op = new AttributeDeleteOperation(attr.getEntityId(), attr.getSubjectEntityId(), attr.getRootSubjectEntity().getEntityId(), KeySelectionValueSelectionValueAttribute.TYPE);
-                                attr.propagateAttributeDeleteOperation(op, CONFIG.WIDGET.NAME.VIEWCANVAS);
+                                attr.propagateAttributeDeleteOperation(op, CONFIG.WIDGET.NAME.MAIN);
                             }
                         }
 
+                        var optVal =  viewType.getAttribute(viewType.getEntityId()+ '[target]').getOptionValue();
+                        viewType.getLabel().getValue().propagateValueChange(CONFIG.OPERATION.TYPE.INSERT, optVal, 0);
 
                         attributeList = {};
                         //the attributes of the new target
@@ -108,18 +108,17 @@ define([
                         //crate the attributes of the new target
                         for (var key2 in targetAttributes) {
                             if (targetAttributes.hasOwnProperty(key2)) {
-                                var id = Util.generateRandomId();
+                                var refAttr = targetAttributes[key2];
+                                var id = refAttr.getEntityId();
 
                                 op = new AttributeAddOperation(id, viewTypeAttribute.getEntityId(), viewTypeAttribute.getRootSubjectEntity().getEntityId(), KeySelectionValueSelectionValueAttribute.TYPE);
 
-                                viewTypeAttribute.propagateAttributeAddOperation(op, CONFIG.WIDGET.NAME.VIEWCANVAS);
+                                viewTypeAttribute.propagateAttributeAddOperation(op, CONFIG.WIDGET.NAME.MAIN);
                                 attr = viewTypeAttribute.getAttribute(id);
-                                attr.getKey().propagateValueChange(CONFIG.OPERATION.TYPE.INSERT, targetAttributes[key2].getKey().getValue(), 0);
-                                attr.getValue().propagateValueChange(CONFIG.OPERATION.TYPE.INSERT, targetAttributes[key2].getValue().getValue(), 0);
-                                if (viewType.getType() === 'ViewRelationship')
-                                    attr.getValue2().propagateValueChange(CONFIG.OPERATION.TYPE.INSERT, targetAttributes[key2].getValue2().getValue(), 0);
+                                attr.getKey().propagateValueChange(CONFIG.OPERATION.TYPE.INSERT, refAttr.getKey().getValue(), 0);
+                                attr.getRef().propagateValueChange(CONFIG.OPERATION.TYPE.INSERT, refAttr.getKey().getValue(), 0);
 
-                                attributeList[id] = targetAttributes[key2].getKey().getValue();
+                                attributeList[id] = refAttr.getKey().getValue();
                             }
                         }
                     }
@@ -132,14 +131,15 @@ define([
                             }
                         }
                     }
-                    if (condListAttr = viewType.getAttribute('[condition]')) {
+                    var condListAttr = viewType.getAttribute('[condition]');
+                    if (condListAttr) {
                         condListAttr.setOptions(attributeList);
                         var attrList = condListAttr.getAttributes();
                         for (var key3 in attrList) {
                             if (attrList.hasOwnProperty(key3)) {
                                 attr = attrList[key3];
                                 op = new AttributeDeleteOperation(attr.getEntityId(), attr.getSubjectEntityId(), attr.getRootSubjectEntity().getEntityId(), ConditionPredicateAttribute.TYPE);
-                                attr.propagateAttributeDeleteOperation(op, CONFIG.WIDGET.NAME.VIEWCANVAS);
+                                attr.propagateAttributeDeleteOperation(op, CONFIG.WIDGET.NAME.MAIN);
                             }
                         }
                     } else {
@@ -152,10 +152,10 @@ define([
                         EntityManager.deleteFromMap(viewType.getViewId(), viewType.getEntityId());
                         EntityManager.addToMap(viewType.getViewId(), node.getEntityId(), viewType.getEntityId());
                         deleteCvgOp = new DeleteCvgOperation(_(viewType.getNeighbors()).keys().value());
-                        _iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.VIEWCANVAS, deleteCvgOp.toNonOTOperation());
+                        _iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.MAIN, deleteCvgOp.toNonOTOperation());
                         var res = CVG(node, that.getRootSubjectEntity());
                         var performCvgOp = new PerformCvgOperation(res);
-                        _iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.VIEWCANVAS, performCvgOp.toNonOTOperation());
+                        _iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.MAIN, performCvgOp.toNonOTOperation());
                     }
                     else{
                         EntityManager.addToMap(viewType.getViewId(), node.getEntityId(), viewType.getEntityId());

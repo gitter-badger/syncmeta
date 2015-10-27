@@ -4,13 +4,15 @@
 	 requirejs(['jqueryui',
 	 'lodash',
 	 'iwcw',
+	 'Util',
 	 'operations/non_ot/UpdateViewListOperation',
-	 'viewcanvas_widget/GenerateViewpointModel'],
-		function($,_,IWC,UpdateViewListOperation,GenerateViewpointModel){
+	 'canvas_widget/GenerateViewpointModel',
+	 'promise!Metamodel'],
+		function($,_,IWC, Util, UpdateViewListOperation,GenerateViewpointModel, metamodel){
 				
 			
 				var iwc  = IWC.getInstance("VIEWCONTROL");
-				iwc.disableBuffer();
+
 				
 				var _viewList = {};
 				var _viewpointList = {};
@@ -51,17 +53,69 @@
 												addMetamodelToSpace(spaceUri, viewpointmodel, CONFIG.NS.MY.VIEWPOINT);
 											})
 										});
-									})
+									});
+									$viewEntry.find('.patch').click(function(event){
+									    var renamingTplStr = '{"id":"<<=id>>","name":"","val":{"id":"<<=id>>[val]","name":"Attribute Name","value":"<<=val>>"},"ref":{"id":"<<=id>>[ref]","name":"Attribute Reference","value":"<<=val>>"},"vis":{"id":"<<=id>>[vis]","name":"Attribute Visibility","value":"show"}}'.replace(/<</g,"<"+"%").replace(/>>/g,"%"+">");
+                                        var renamingAttrTpl = _.template(renamingTplStr);
+
+                                        var resource_uri = $(event.target).parents('tr').find('.lblviewname').attr('uri');
+
+                                        require(['promise!Model'], function(model){
+
+                                        openapp.resource.get(resource_uri,function(context){
+                                             openapp.resource.context(context).representation().get(function (rep) {
+                                                var attr, attributes, attrList, renamingAttr, refKey;
+                                                var data = rep.data;
+                                        	    var nodes = data.nodes;
+                                        	    for(var nKey in nodes){
+                                        	        if(nodes.hasOwnProperty(nKey) && (nodes[nKey].type === 'ViewObject' || nodes[nKey].type === 'ViewRelationship')){
+                                        	            var refNode = model.nodes[nodes[nKey].attributes[nKey+'[target]'].value.value];
+                                        	            if(refNode){
+                                        	                attributes = nodes[nKey].attributes['[attributes]'];
+                                                            attributes.type = 'RenamingListAttribute';
+                                                            attributes.list  = {};
+                                                            attrList = refNode.attributes['[attributes]'].list;
+
+                                                            for(var attrKey in attrList){
+                                                                if(attrList.hasOwnProperty(attrKey)){
+                                                                    attr = attrList[attrKey];
+                                                                    attributes.list[attrKey] = JSON.parse(renamingAttrTpl({id:attrKey, val:attr.key.value}));
+
+                                                                }
+                                                            }
+                                        	            }else{
+                                        	                console.error('No reference');
+                                        	            }
+
+
+
+
+                                        	        }
+                                        	    }
+
+                                            	    openapp.resource.context(context).representation().json(data).put(function(res){
+                                            	        console.log(res);
+                                            	    });
+
+                                        	});
+                                        });
+
+									});
+									});
 									$(appendTo).append($viewEntry);	
 								});
 							});
 						} 
 					}); 
 				}						
-				var GetListEntryTemplate = function(){
-					var templateString = '<tr><td class="lblviewname" uri=<<= uri >>><<= name >></td><td><button class="json">JSON</button></td><td><button class="del">Del</button></td><td><button class="ToSpace">Add To Space</button></td></tr>'.replace(/<</g,"<"+"%").replace(/>>/g,"%"+">");
+				var GetViewListEntryTemplate = function(){
+					var templateString = '<tr><td class="lblviewname" uri=<<= uri >>><<= name >></td><td><button class="json">JSON</button></td><td><button class="del">Del</button></td><td><button class="ToSpace">Add To Space</button></td><td><button class="patch">Patch</button></td></tr>'.replace(/<</g,"<"+"%").replace(/>>/g,"%"+">");
 					return tpl = _.template(templateString);
 				}
+				var GetViewpointListEntryTemplate = function(){
+                	var templateString = '<tr><td class="lblviewname" uri=<<= uri >>><<= name >></td><td><button class="json">JSON</button></td><td><button class="del">Del</button></td></tr>'.replace(/<</g,"<"+"%").replace(/>>/g,"%"+">");
+                    return tpl = _.template(templateString);
+                }
 				var getFileContent = function($node){
 				var fileReader,
                     files = $node[0].files,
@@ -99,16 +153,32 @@
 						}); 
 					});
 			}
-			
-		GetList(CONFIG.NS.MY.VIEW, '#viewlist', GetListEntryTemplate());
-		GetList(CONFIG.NS.MY.VIEWPOINT, '#viewpointlist', GetListEntryTemplate());
-			
+
+        //In metamodeling layer
+	    if(metamodel.constructor === Object){
+	        $('#viewlist').parent().hide();
+	        $('#btnLoadView').hide();
+	        $('#btnDelAllView').hide();
+	    }
+	    else{
+	        $('#viewpointlist').parent().hide();
+	        $('#btnLoadViewpoint').hide();
+	        $('#div1').show();
+	    }
+
+		GetList(CONFIG.NS.MY.VIEW, '#viewlist', GetViewListEntryTemplate());
+		GetList(CONFIG.NS.MY.VIEWPOINT, '#viewpointlist', GetViewpointListEntryTemplate());
+
+
+
 		$('#btnRefresh').click(function(){
-			var tpl = GetListEntryTemplate();
-			$('#viewlist').empty();
-			$('#viewpointlist').empty();
-			GetList(CONFIG.NS.MY.VIEW, '#viewlist', tpl);
-			GetList(CONFIG.NS.MY.VIEWPOINT, '#viewpointlist', tpl);
+		    if(metamodel.constructor !== Object){
+			    $('#viewlist').empty();
+			    GetList(CONFIG.NS.MY.VIEW, '#viewlist', GetViewListEntryTemplate());
+			}else{
+			    $('#viewpointlist').empty();
+                GetList(CONFIG.NS.MY.VIEWPOINT, '#viewpointlist', GetViewpointListEntryTemplate());
+			}
 			var operation = new UpdateViewListOperation();
 			iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.MAIN, operation.toNonOTOperation());
 		});
@@ -159,23 +229,46 @@
 	td {
 		padding: 5;
 	}
+	.seperating_box {
+	    border: 1px solid;
+        border-radius: 7px;
+        margin: 18px 20px 7px 7px;
+        padding: 7px 20px 7px 7px;
+        position: relative;
+    }
+    .seperating_box > h5 {
+        font-weight: normal;
+        font-style: italic;
+        position: absolute;
+        top: -40px;
+        left: 4px;
+        }
 </style>
 <div id="viewcontrol">
-<p><strong>Editor space url:</strong>
+<div class="seperating_box" style="display:none" id="div1">
+<h5>Add a Viewpoint to a Model Editor instance</h5>
+<strong>Editor space url:</strong>
     <br/>
     <span id="space_link_input_view"><%= grunt.config('roleSandboxUrl') %>/<input size="16" type="text" id="space_label_view" /></span>
     <br/>
-</p>
-<button id="btnRefresh">Refresh Lists</button><button id="btnDelAllView">Delete all Views</button>
-<input type="file" id="btnImport" />
-<button id="btnLoadView">Load a View</button>
-<button id="btnLoadViewpoint">Load a Viewpoint</button>
-<p>
-<strong>View List</strong>
-<table id="viewlist"></table>
-</p>
-<p>
-<strong>Viewpoint List</strong>
-<table id="viewpointlist"></table>
-</p>	
+</div>
+<div class="seperating_box">
+    <h5>Select a JSON file</h5>
+    <input type="file" id="btnImport" />
+</div>
+<div class="seperating_box">
+<h5>Control Elements</h5>
+    <button id="btnRefresh">Refresh Lists</button>
+    <button id="btnLoadView">Load a View</button>
+    <button id="btnLoadViewpoint">Load a Viewpoint</button>
+    <button id="btnDelAllView">Delete all Views</button>
+</div>
+<div class="seperating_box">
+    <strong>View List</strong>
+    <table id="viewlist"></table>
+</div>
+<div class="seperating_box">
+    <strong>Viewpoint List</strong>
+    <table id="viewpointlist"></table>
+</div>
 </div>

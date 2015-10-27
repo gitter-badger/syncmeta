@@ -42,6 +42,17 @@ define([
 
             AbstractNode.call(this,id,type,left,top,width,height,zIndex);
 
+            var currentViewType = null;
+
+            this.setCurrentViewType = function(type){
+                currentViewType = type;
+            };
+
+            this.getCurrentViewType = function(){
+                return currentViewType;
+            };
+
+
             /**
              * jQuery object of node template
              * @type {jQuery}
@@ -105,6 +116,13 @@ define([
                 return _anchorOptions;
             };
 
+            /** Set anchor options for new connections
+             *
+             */
+            this.setAnchorOptions = function(anchors){
+              _anchorOptions = anchors;
+            };
+
             /**
              * Bind source node events for edge tool
              */
@@ -122,6 +140,7 @@ define([
                     }
                 });
             };
+
 
             /**
              * Bind target node events for edge tool
@@ -160,8 +179,59 @@ define([
                 return json;
             };
 
+            /**
+             * set a new shape for the node
+             * @param $shape
+             */
+            this.set$shape = function($shape){
+                _$template.remove();
+                var _$shape = $shape.clone();
+
+                var attributes = that.getAttributes();
+                for(var attrKey in attributes){
+                    if(attributes.hasOwnProperty(attrKey)){
+                        var attribute = attributes[attrKey];
+                        var $tmp = _$shape.find('.'+attribute.getName().toLowerCase());
+                        if($tmp.length > 0){
+                            //initialize the value again
+                            attribute.getValue().init();
+
+                            $tmp.append(attribute.get$node());
+                            break;
+                        }
+                    }
+                }
+                _$template = _$shape;
+                _$node.append(_$shape);
+            };
+
+            /**
+             * hide the node and all associated edges
+             */
+            this.hide = function(){
+                _$node.hide();
+                jsPlumb.hide(_$node);
+            };
+
+            /**
+             * show the node and all associated edges
+             */
+            this.show = function(){
+                _$node.show();
+                jsPlumb.show(_$node);
+            };
+
             init();
         }
+
+        Node.get$shape = function(){
+            return $shape;
+        };
+
+        Node.getAnchors = function(){
+            return anchors;
+        };
+
         return Node;
     }
 

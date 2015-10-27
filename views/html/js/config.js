@@ -61,14 +61,16 @@ var require = {
 };
 
 CONFIG = {
-    INSTANCE_FLAG:false,
+    LAYER:{
+        META: "META",
+        MODEL: "MODEL"
+    },
     WIDGET: {
         NAME: {
             MAIN: "MAIN",
             PALETTE: "PALETTE",
             ATTRIBUTE: "ATTRIBUTE",
-            ACTIVITY: "ACTIVITY",
-			VIEWCANVAS: "VIEWCANVAS"
+            ACTIVITY: "ACTIVITY"
         }
     },
     ENTITY: {

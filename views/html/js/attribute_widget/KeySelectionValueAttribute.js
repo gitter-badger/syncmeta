@@ -160,6 +160,8 @@ define([
             _iwc.unregisterOnDataReceivedCallback(attributeDeleteCallback);
         };
 
+
+
         _$node.find(".key").append(_key.get$node());
         _$node.find(".value").append(_value.get$node());
         _$node.find(".ui-icon-close").click(function(){

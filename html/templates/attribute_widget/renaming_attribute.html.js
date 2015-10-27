@@ -1,0 +1,1 @@
+define('text!templates/attribute_widget/renaming_attribute.html',[],function () { return '<li class="renaming_attr">\n    <div class="val"></div>\n    <div class="ref" ></div>\n    <div class="vis"></div>\n</li>';});
