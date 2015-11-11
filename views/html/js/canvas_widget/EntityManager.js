@@ -272,6 +272,8 @@ define([
 			nodes : {},
 			edges : {}
 		};
+
+
 		//noinspection JSUnusedGlobalSymbols
 		return {
 			/**
@@ -296,6 +298,8 @@ define([
 					node = _recycleBin.nodes[id];
 					delete _recycleBin.nodes[id];
 					_nodes[id] = node;
+                    //Register context menu
+                    node.init();
 					return node;
                 }
 
@@ -587,15 +591,117 @@ define([
                         canvas.createNode(nodeType,left,top,width,height);
                     };
                 }
-
                 var items = {},
-                    nodeType;
+                    nodeType,
+                    _nodeTypes;
 
-                for(nodeType in nodeTypes){
-                    if(nodeTypes.hasOwnProperty(nodeType)){
+                if(_viewId &&  _layer === CONFIG.LAYER.MODEL){
+                    _nodeTypes = viewNodeTypes;
+                }
+                else{
+                    _nodeTypes = nodeTypes;
+                }
+
+                for(nodeType in _nodeTypes){
+                    if(_nodeTypes.hasOwnProperty(nodeType)){
+                       if(_layer === CONFIG.LAYER.META && !_viewId && (nodeType === 'ViewObject' || nodeType ==='ViewRelationship')) continue;
                         items[nodeType] = {
                             name: '..' + nodeType,
-                            callback: makeAddNodeCallback(nodeType,nodeTypes[nodeType].DEFAULT_WIDTH,nodeTypes[nodeType].DEFAULT_HEIGHT)
+                            callback: makeAddNodeCallback(nodeType,_nodeTypes[nodeType].DEFAULT_WIDTH,_nodeTypes[nodeType].DEFAULT_HEIGHT)
+                        };
+                    }
+                }
+                return items;
+            },
+            /**
+             * generates the context menu for the show and hide opeations on node types
+             * @returns {object}
+             */
+            generateVisibilityNodeMenu:function(visibilty){
+                var _applyVisibilityCallback = function(nodeType, vis){
+                    return function() {
+                        if (vis !== 'show' && vis !== 'hide') return;
+                        var nodes;
+                        if (_viewId && _layer === CONFIG.LAYER.MODEL) {
+                            nodes = that.getNodesByViewType(nodeType);
+                        } else {
+                            nodes = that.getNodesByType(nodeType);
+                        }
+                        for (var nKey in nodes) {
+                            if (nodes.hasOwnProperty(nKey)) {
+                                nodes[nKey][vis]();
+                            }
+                        }
+                        return false;
+                    }
+                };
+
+                var that = this;
+                var items = {},
+                    nodeType,
+                    _nodeTypes;
+
+                if(_viewId &&  _layer === CONFIG.LAYER.MODEL){
+                    _nodeTypes = viewNodeTypes;
+                }
+                else{
+                    _nodeTypes = nodeTypes;
+                }
+
+                for(nodeType in _nodeTypes){
+                    if(_nodeTypes.hasOwnProperty(nodeType)){
+                        if(_layer === CONFIG.LAYER.META && !_viewId && (nodeType === 'ViewObject' || nodeType ==='ViewRelationship')) continue;
+                        items[visibilty+nodeType] = {
+                            name: '..' + nodeType,
+                            callback: _applyVisibilityCallback(nodeType,visibilty)
+                        };
+                    }
+                }
+                return items;
+            },
+            /**
+             * generates a the context menu for the show and hide operations on edge types
+             * @returns {object}
+             */
+            generateVisibilityEdgeMenu:function(){
+                function applyVisibilityCallback(edgeType, vis){
+                    if(vis !=='show' && vis !== 'hide') return;
+                    var edges;
+                    if (_viewId && _layer === CONFIG.LAYER.MODEL) {
+                        edges = that.getEdgesByViewType(edgeType);
+                    } else {
+                        edges = that.getEdgesByType(edgeType);
+                    }
+                    for (var eKey in edges) {
+                        if (edges.hasOwnProperty(eKey)) {
+                            edges[eKey][vis]();
+                        }
+                    }
+                }
+                var that = this;
+                var items = {},
+                    edgeType,
+                    _edgeTypes;
+
+                if(_viewId &&  _layer === CONFIG.LAYER.MODEL){
+                     _edgeTypes= viewEdgeTypes;
+                }
+                else{
+                    _edgeTypes = edgeTypes;
+                }
+
+                for(edgeType in _edgeTypes){
+                    if(_edgeTypes.hasOwnProperty(edgeType)){
+                        items[edgeType] = {
+                            name: '..' + edgeType,
+                            callback: function(key, options){
+                                if(options.$menu.children('li.hover.visible').text().indexOf('Hide') != -1) {
+                                    applyVisibilityCallback(key, 'hide');
+                                }else{
+                                    applyVisibilityCallback(key, 'show');
+                                }
+                                return false;
+                            }
                         };
                     }
                 }
@@ -641,16 +747,21 @@ define([
                         for(i = 0, numOfRelations = relations[connectionType].length; i < numOfRelations; i++){
                             sourceNodeTypes = relations[connectionType][i].sourceTypes;
                             targetNodeTypes = relations[connectionType][i].targetTypes;
-                            if(sourceNodeTypes.indexOf(node.getType()) !== -1){
-                                for(j = 0, numOfTargetTypes = targetNodeTypes.length; j < numOfTargetTypes; j++){
+                            if(sourceNodeTypes.indexOf(node.getType()) !== -1 || (_layer === CONFIG.LAYER.MODEL && _viewId && sourceNodeTypes.indexOf(node.getCurrentViewType()) !== -1)){
+                                for(j = 0, numOfTargetTypes = targetNodeTypes.length;j < numOfTargetTypes; j++){
                                     targetNodeType = targetNodeTypes[j];
                                     targetNodeItems = {};
-                                    targetNodes = this.getNodesByType(targetNodeType);
+                                    if(_viewId && _layer ===CONFIG.LAYER.MODEL){
+                                        targetNodes = this.getNodesByViewType(targetNodeType);
+                                    }else {
+                                        targetNodes = this.getNodesByType(targetNodeType);
+                                    }
                                     existsLinkableTargetNode = false;
                                     for(targetNodeId in targetNodes){
                                         if(targetNodes.hasOwnProperty(targetNodeId)){
                                             targetNode = targetNodes[targetNodeId];
                                             if(targetNode === node) continue;
+                                            if(_layer === CONFIG.LAYER.MODEL && _viewId && targetNode.getCurrentViewType() === null) continue;
                                             targetAppearance = targetNode.getAppearance();
                                             if(!targetNode.getNeighbors().hasOwnProperty(node.getEntityId())){
                                                 targetNodeItems[connectionType+targetNodeType+i+targetNodeId] = {
@@ -1196,6 +1307,17 @@ define([
             getNodesByViewType : function(type){
                 if(viewNodeTypes.hasOwnProperty(type)){
                     return this.getNodesByType(viewNodeTypes[type].getTargetNodeType().TYPE);
+                }
+                return null;
+            },
+            /**
+             * get edges by view type
+             * @param {string}type the view type
+             * @returns {*}
+             */
+            getEdgesByViewType:function(type){
+                if(viewEdgeTypes.hasOwnProperty(type)){
+                    return this.getEdgesByType(viewEdgeTypes[type].getTargetEdgeType().TYPE);
                 }
                 return null;
             },

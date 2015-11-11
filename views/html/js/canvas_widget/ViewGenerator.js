@@ -19,6 +19,7 @@ define(['canvas_widget/EntityManager'], /**@lends ViewGenerator*/ function (Enti
             node.show();
         }
         else{
+            node.setCurrentViewType(null);
             node.hide();
         }
     }
@@ -166,9 +167,6 @@ define(['canvas_widget/EntityManager'], /**@lends ViewGenerator*/ function (Enti
                     var viewNodeTypeObject = EntityManager.getViewNodeType(nodeViewType.label);
                     applyNodeTypeToNodes(viewNodeTypeObject, EntityManager.getNodesByType(viewNodeTypeObject.getTargetNodeType().TYPE));
                 }
-                else{
-                    //Todo handle new Object classes
-                }
             }
         }
 
@@ -194,8 +192,6 @@ define(['canvas_widget/EntityManager'], /**@lends ViewGenerator*/ function (Enti
                     _processed[edgeViewType.target] = true;
                     var viewEdgeTypeObject = EntityManager.getViewEdgeType(edgeViewType.label);
                     applyEdgeTypeToEdges(viewEdgeTypeObject, EntityManager.getEdgesByType(viewEdgeTypeObject.getTargetEdgeType().TYPE));
-                } else{
-                    //Todo new Object classes
                 }
             }
         }

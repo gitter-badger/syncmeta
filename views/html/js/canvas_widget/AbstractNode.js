@@ -420,7 +420,7 @@ define([
             }
         };
 
-        var init = function(){
+        this.init = function(){
             //Define Node Rightclick Menu
             $.contextMenu({
                 selector: "#"+id,
@@ -459,33 +459,9 @@ define([
                                     that.triggerDeletion();
                                 }
                             },
-                            sepAdd: "-----------",
-                            sepAdd2: "-----------",
-                            addNode: {
-                                name: "Add node..",
-                                items: require('canvas_widget/EntityManager').generateAddNodeMenu(that.getCanvas(), e.originalEvent.offsetX+offsetClick.left-offsetCanvas.left, e.originalEvent.offsetY+offsetClick.top-offsetCanvas.top)
-                            },
-                            copy:{
-                                name:'Copy',
-                                callback:function(){
-                                    var resourceSpace = new openapp.oo.Resource(openapp.param.space());
-                                    require(["promise!Space"], function(Space){
-                                        resourceSpace.getSubResources({
-                                            relation: openapp.ns.role + "data",
-                                            type: CONFIG.NS.MY.COPY+":"+Space.user[CONFIG.NS.PERSON.JABBERID],
-                                            onAll: function(items) {
-                                                for(var i=0;i<items.length;i++) {
-                                                    openapp.resource.del(items[i].uri);
-                                                }
-                                                resourceSpace.create({
-                                                    relation: openapp.ns.role + "data",
-                                                    type: CONFIG.NS.MY.COPY+":"+Space.user[CONFIG.NS.PERSON.JABBERID],
-                                                    representation: that.toJSON()
-                                                });
-                                            }
-                                        });
-                                    });
-                                }
+                            quit:{
+                                name:' ',
+                                disabled:true
                             }
                         });
 
@@ -1203,7 +1179,7 @@ define([
                 propagateNodeMoveOperation(operation);
             }
         }
-        init();
+        that.init();
 
         if(_iwcot){
             that.registerCallbacks();
@@ -1232,6 +1208,24 @@ define([
     AbstractNode.prototype.toJSON = function(){
         return this._toJSON();
     };
+
+    /**
+     * hide the node and all associated edges
+     */
+    AbstractNode.prototype.hide = function(){
+        this.get$node().hide();
+        jsPlumb.hide(this.get$node());
+    };
+
+    /**
+     * show the node and all associated edges
+     */
+    AbstractNode.prototype.show = function(){
+        this.get$node().show();
+        jsPlumb.show(this.get$node());
+        jsPlumb.repaint(this.get$node());
+    };
+
 
     return AbstractNode;
 
