@@ -1,5 +1,5 @@
 var require = {
-    baseUrl: "http://rwth-acis.github.io/syncmeta/views/html/js",
+    baseUrl: "http://rwth-acis.github.io/syncmeta/beckmann/html/js",
     waitSeconds: 0,
     shim: {
         iwc: {
