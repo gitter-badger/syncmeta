@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- generated on Wed Sep 16 2015 14:55:55 -->
+<!-- generated on Tue Dec 15 2015 17:06:02 -->
 <Module>
   <ModulePrefs
     title="IMS LD Export"
@@ -12,17 +12,17 @@
     <Require feature="opensocial-0.8" ></Require>
     <Require feature="openapp" ></Require>
     <Require feature="dynamic-height"></Require>
-    
-    <OAuth>		
-      <Service name="openapp" xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/"		
-               openapp:service="http://purl.org/role/terms/spaceService"		
-               openapp:permitReadAppend="http://purl.org/role/terms/data">		
-        <Request method="" url=""></Request>		
-        <Authorization url=""></Authorization>		
-        <Access method="" url=""></Access>		
-      </Service>		
+	
+	<OAuth>
+      <Service name="openapp" xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/"
+               openapp:service="http://purl.org/role/terms/spaceService"
+               openapp:permitReadAppend="http://purl.org/role/terms/data">
+        <Request method="" url=""></Request>
+        <Authorization url=""></Authorization>
+        <Access method="" url=""></Access>
+      </Service>
     </OAuth>
-    
+	
   </ModulePrefs>
   <Content type="html">
     <![CDATA[
@@ -58,8 +58,9 @@
           timeout();
         })();
     </script>
-    <script src="https://rwth-acis.github.io/syncmeta/html/js/config.js"></script>
-    <script src="https://rwth-acis.github.io/syncmeta/html/js/lib/vendor/require.js"></script>    
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/lib/parallel.js"></script>
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/config.js"></script>
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/lib/vendor/require.js"></script>    
     <script type="application/javascript">
 requirejs([
     'jqueryui',
@@ -1241,7 +1242,7 @@ requirejs([
 <style>
     /*noinspection CssUnknownTarget,CssUnusedSymbol*/
     .loading_button {
-        background-image: url('https://rwth-acis.github.io/syncmeta/html/img/loading_small.gif');
+        background-image: url('http://rwth-acis.github.io/syncmeta/views/html/img/loading_small.gif');
         background-repeat: no-repeat;
         background-position: right center;
         padding-right: 20px;
@@ -1326,7 +1327,7 @@ requirejs([
 
 
   
-    <script src="https://rwth-acis.github.io/syncmeta/html/js/shared.js"></script>    
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/shared.js"></script>    
     ]]>
   </Content>
 </Module>

@@ -32,8 +32,6 @@ define(['lodash', 'Util'],
             }
         }
 
-
-
         /**
          * the closed-view-generation algorithm
          * looks for neighbors of a base node and generates a json to add the neighbors to the viewpoint model
@@ -56,7 +54,7 @@ define(['lodash', 'Util'],
                     var refId = null, newEdgeId = null, originalEdge = null;
                     var neighbor = neighbors[neighborId];
                     //node shapes, edge shapes and enums are connected by a bi-dir-association
-                    if(neighbor.getType()=== 'Node Shape' || neighbor.getType()=== 'Edge Shape' || neighbor.getType() === 'Enumeration') {
+                    if(neighbor.getType()=== 'Node Shape' || neighbor.getType()=== 'Edge Shape' /*|| neighbor.getType() === 'Enumeration'*/) {
                         //create the neighbor if he is not in the map dictionary
                         if(!EntityManager.doesMapExists(viewId, neighborId)){
                             addToViewpoint.nodes[newId] = neighborId;
@@ -90,7 +88,6 @@ define(['lodash', 'Util'],
                     }else if(neighbor.getType() === 'Relation'){
                         var relationNeighbors = neighbor.getNeighbors();
                         for(var key in relationNeighbors){
-                            //TODO wtf
                             if(relationNeighbors.hasOwnProperty(key) &&
                                 ((relationNeighbors[key].getType() === 'Relationship' && baseNode.getType() === 'Object')
                                 || (relationNeighbors[key].getType() === 'Object' && baseNode.getType() === 'Relationship'))){

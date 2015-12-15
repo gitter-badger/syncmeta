@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- generated on Wed Sep 16 2015 14:55:55 -->
+<!-- generated on Tue Dec 15 2015 17:06:02 -->
 <Module>
   <ModulePrefs
     title="Generate Instance"
@@ -12,17 +12,17 @@
     <Require feature="opensocial-0.8" ></Require>
     <Require feature="openapp" ></Require>
     <Require feature="dynamic-height"></Require>
-    
-    <OAuth>		
-      <Service name="openapp" xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/"		
-               openapp:service="http://purl.org/role/terms/spaceService"		
-               openapp:permitReadAppend="http://purl.org/role/terms/data">		
-        <Request method="" url=""></Request>		
-        <Authorization url=""></Authorization>		
-        <Access method="" url=""></Access>		
-      </Service>		
+	
+	<OAuth>
+      <Service name="openapp" xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/"
+               openapp:service="http://purl.org/role/terms/spaceService"
+               openapp:permitReadAppend="http://purl.org/role/terms/data">
+        <Request method="" url=""></Request>
+        <Authorization url=""></Authorization>
+        <Access method="" url=""></Access>
+      </Service>
     </OAuth>
-    
+	
   </ModulePrefs>
   <Content type="html">
     <![CDATA[
@@ -58,16 +58,18 @@
           timeout();
         })();
     </script>
-    <script src="https://rwth-acis.github.io/syncmeta/html/js/config.js"></script>
-    <script src="https://rwth-acis.github.io/syncmeta/html/js/lib/vendor/require.js"></script>    
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/lib/parallel.js"></script>
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/config.js"></script>
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/lib/vendor/require.js"></script>    
     <script type="application/javascript">
     requirejs([
         'jqueryui',
         'lodash',
         'Util',
         'iwcw',
-        'operations/non_ot/ExportMetaModelOperation'
-    ],function($,_,Util,IWCW,ExportMetaModelOperation){
+        'operations/non_ot/ExportMetaModelOperation',
+        'canvas_widget/GenerateViewpointModel'
+    ],function($,_,Util,IWCW,ExportMetaModelOperation,GenerateViewpointModel){
 
         var componentName = "export"+Util.generateRandomId();
 
@@ -122,7 +124,7 @@
                 return deferred.promise();
             }
 
-            function addMetamodelToSpace(spaceURI,metamodel){
+            function addMetamodelToSpace(spaceURI,metamodel, type){
                 var deferred = $.Deferred();
                 var deferred2 = $.Deferred();
                 openapp.resource.post(
@@ -131,7 +133,7 @@
                             deferred.resolve(data.uri);
                         },{
                             "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate":"http://purl.org/role/terms/data",
-                            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type":"my:ns:metamodel"
+                            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type":type
                         });
                 deferred.promise().then(function(dataURI){
                     openapp.resource.put(
@@ -144,7 +146,7 @@
                 });
                 return deferred2.promise();
             }
-
+			
             function storeGeneratedInstanceMeta(spaceURI,spaceTitle){
                 var resourceSpace = new openapp.oo.Resource(openapp.param.space()),
                         deferred = $.Deferred(),
@@ -194,36 +196,57 @@
 
             function getMetaModel(){
                 var deferred = $.Deferred();
-                iwc.registerOnDataReceivedCallback(function(operation){
-                    if(operation instanceof ExportMetaModelOperation){
-                        deferred.resolve(operation.getData());
-                    }
+                Util.GetCurrentBaseModel().done(function(meta){
+                    deferred.resolve(GenerateViewpointModel(meta));
                 });
-                var operation = new ExportMetaModelOperation(componentName,null);
-                iwc.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.MAIN,operation.toNonOTOperation());
                 return deferred.promise();
             }
 
-            return getMetaModel().then(function(metamodel){
+			function getViewpoints(){
+				var deferred = $.Deferred();
+				 var resourceSpace = new openapp.oo.Resource(openapp.param.space());
+				 resourceSpace.getSubResources({
+						relation: openapp.ns.role + "data", type: CONFIG.NS.MY.VIEW,
+						onAll: function(viewpoints) {
+							deferred.resolve(viewpoints); 
+						} 
+					}); 
+				return deferred.promise();
+			}
+			function GetViewPoint(resource){
+				var deferred = $.Deferred();
+				resource.getRepresentation("rdfjson",function(rep){
+					deferred.resolve(rep); 
+				});
+				return deferred.promise();
+			}
+            return $.when(getMetaModel(), getViewpoints()).then(function(metamodel, viewpoints){
                 return createSpace(spaceLabel,spaceTitle)
                     .then(function(spaceURI){
-                        return addWidgetToSpace(spaceURI,"https://rwth-acis.github.io/syncmeta/html/activity.xml")
+                        return addWidgetToSpace(spaceURI,"http://rwth-acis.github.io/syncmeta/views/html/activity.xml")
                             .then(function(){
-                                return addWidgetToSpace(spaceURI,"https://rwth-acis.github.io/syncmeta/html/widget.xml");
+                                return addWidgetToSpace(spaceURI,"http://rwth-acis.github.io/syncmeta/views/html/widget.xml");
                             }).then(function(){
-                                return addWidgetToSpace(spaceURI,"https://rwth-acis.github.io/syncmeta/html/palette.xml");
+                                return addWidgetToSpace(spaceURI,"http://rwth-acis.github.io/syncmeta/views/html/palette.xml");
                             }).then(function(){
-                                return addWidgetToSpace(spaceURI,"https://rwth-acis.github.io/syncmeta/html/attribute.xml");
+                                return addWidgetToSpace(spaceURI,"http://rwth-acis.github.io/syncmeta/views/html/attribute.xml");
                             }).then(function(){
-                                return addWidgetToSpace(spaceURI,"https://rwth-acis.github.io/syncmeta/html/export.xml");
+                                return addWidgetToSpace(spaceURI,"http://rwth-acis.github.io/syncmeta/views/html/debug.xml");
                             }).then(function(){
-                                return addWidgetToSpace(spaceURI,"https://rwth-acis.github.io/syncmeta/html/imsld_export.xml");
+                                return addMetamodelToSpace(spaceURI,metamodel, CONFIG.NS.MY.METAMODEL);
                             }).then(function(){
-                                return addMetamodelToSpace(spaceURI,metamodel);
-                            }).then(function(){
+								var deferred = $.Deferred();
+								for(var i=0;i<viewpoints.length;i++){
+									GetViewPoint(viewpoints[i]).then(function(viewpoint){
+									    var viewpointmodel = GenerateViewpointModel(viewpoint);
+										addMetamodelToSpace(spaceURI, viewpointmodel, CONFIG.NS.MY.VIEWPOINT);
+									});
+								}
+								deferred.resolve(); 
+								return deferred.promise();
+							}).then(function(){
                                 return storeGeneratedInstanceMeta(spaceURI,spaceTitle);
                             }).then(function(){
-
                                 return {
                                     spaceURI: spaceURI,
                                     spaceTitle: spaceTitle
@@ -364,7 +387,7 @@
     /*noinspection CssUnusedSymbol*/
     .loading_button {
         /*noinspection CssUnknownTarget*/
-        background-image: url('https://rwth-acis.github.io/syncmeta/html/img/loading_small.gif');
+        background-image: url('http://rwth-acis.github.io/syncmeta/views/html/img/loading_small.gif');
         background-repeat: no-repeat;
         background-position: right center;
         padding-right: 20px;
@@ -385,7 +408,7 @@
 <button id="reset">Reset</button>
 <p><strong>Generated instances:</strong>
 <ul id="list"></ul>
-    <script src="https://rwth-acis.github.io/syncmeta/html/js/shared.js"></script>    
+    <script src="http://rwth-acis.github.io/syncmeta/views/html/js/shared.js"></script>    
     ]]>
   </Content>
 </Module>
