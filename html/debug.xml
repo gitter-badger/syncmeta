@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- generated on Tue Dec 15 2015 17:16:02 -->
+<!-- generated on Tue Jan 05 2016 12:29:28 -->
 <Module>
   <ModulePrefs
     title="Debug"
@@ -58,7 +58,6 @@
           timeout();
         })();
     </script>
-    <script src="http://rwth-acis.github.io/syncmeta/html/js/lib/parallel.js"></script>
     <script src="http://rwth-acis.github.io/syncmeta/html/js/config.js"></script>
     <script src="http://rwth-acis.github.io/syncmeta/html/js/lib/vendor/require.js"></script>    
     <script type="application/javascript">
