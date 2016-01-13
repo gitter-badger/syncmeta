@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- generated on Wed Jan 13 2016 14:45:02 -->
+<Module>
+  <ModulePrefs
+    title="Guidance widget"
+    description=""
+    author="Stephan Erdtmann"
+    author_email="erdtmann@dbis.rwth-aachen.de"
+    width="300"
+    height="400">
+
+    <Require feature="opensocial-0.8" ></Require>
+    <Require feature="openapp" ></Require>
+    <Require feature="dynamic-height"></Require>
+	
+	<OAuth>
+      <Service name="openapp" xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/"
+               openapp:service="http://purl.org/role/terms/spaceService"
+               openapp:permitReadAppend="http://purl.org/role/terms/data">
+        <Request method="" url=""></Request>
+        <Authorization url=""></Authorization>
+        <Access method="" url=""></Access>
+      </Service>
+    </OAuth>
+	
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+    <script type="application/javascript">
+        (function(){
+          var cnt = 30; // 5 attempts per second => 6 seconds
+          var timeout = function(){
+              var btn = document.getElementById("oauthPersonalizeButton");
+              var wrapper = document.getElementById("oauthPersonalize");
+              if(wrapper && wrapper.offsetParent !== null && btn && btn.onclick){
+                  var win = null;
+                  var openWindow = window.open;
+                  window.open = function(){return win = openWindow.apply(window,arguments);};
+                  btn.onclick.call(btn);
+                  if(win){
+                      win.onload = function(){
+                          win.document.getElementsByTagName("form")[0].submit();
+                          setTimeout(function(){
+                              window.location.reload();
+                              if(win){
+                                  win.close();
+                              }
+                          },1000);
+                      };
+                  }
+              } else {
+                  if(cnt > 0){
+                      cnt -= 1;
+                      setTimeout(timeout,200);
+                  }
+              }
+          };
+          timeout();
+        })();
+    </script>
+    <script src="http://rwth-acis.github.io/syncmeta/html/js/config.js"></script>
+    <script src="http://rwth-acis.github.io/syncmeta/html/js/lib/vendor/require.js"></script>    
+    <link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/html/css/vendor/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/html/css/style.css">
+<link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/html/css/vendor/bootstrap.min.prefixed.css">
+<!-- <link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/html/css/vendor/font-awesome/css/font-awesome.min.css"> -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<script src="http://rwth-acis.github.io/syncmeta/html/js/guidance_widget.js"></script>
+<div id="guidance">
+<div class="bs-btn-group">
+	<div class="bs-form-group">
+		<label for="strategyButton">Guidance Strategy</label>
+  <button id="strategyButton" type="button" class="bs-btn bs-btn-default bs-dropdown-toggle bs-form-control" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select a strategy<span class="bs-caret"></span>
+  </button>
+  <ul class="bs-dropdown-menu" id="guidanceSelect">
+  </ul>
+</div>
+</div>
+</div>
+<div id="guidance-strategy-ui" style="height:320px; overflow:auto;">
+<div>
+    <script src="http://rwth-acis.github.io/syncmeta/html/js/shared.js"></script>    
+    ]]>
+  </Content>
+</Module>
