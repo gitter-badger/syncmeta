@@ -1,0 +1,1 @@
+define('text!templates/canvas_widget/awareness_trace.html',[],function () { return '<div id="<%= id %>" class="trace_awareness">\n<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 100 100" style="overflow: visible;">\n        <circle cx="0" cy="0" r="50" stroke="lightgray" stroke-width="0" />\n</svg>\n</div>';});

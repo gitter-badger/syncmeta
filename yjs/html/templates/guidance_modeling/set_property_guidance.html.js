@@ -1,0 +1,1 @@
+define('text!templates/guidance_modeling/set_property_guidance.html',[],function () { return '<div class="bs-btn-group" role="group">\n<button class="bs-btn bs-btn-default bs-dropdown-toggle" data-toggle="dropdown">\n\t<i class="fa fa-<%= icon %>"></i>\n\t<%= text %>\n</button>\n<ul class="bs-dropdown-menu">\n\t<li class="property-input"></li>\n</ul>\n</div>';});
