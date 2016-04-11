@@ -1,1 +1,1 @@
-define('text!templates/guidance_modeling/collaboration_guidance.html',[],function () { return '<button class="bs-btn bs-btn-default">\n\t<i class="fa fa-users"></i>\n\t<%= text %>\n</button>';});
+define('text!templates/guidance_modeling/collaboration_guidance.html',[],function () { return '<button class="bs-btn bs-btn-default">\r\n\t<i class="fa fa-users"></i>\r\n\t<%= text %>\r\n</button>';});

@@ -1,1 +1,1 @@
-define('text!templates/heatmap_widget/heatspot.html',[],function () { return '<div style="position:absolute; border-style:solid; border-width:1px;">\n\t<div class="background" style="opacity:0; width: 100%; height: 100%; background-color: white;">\n\t</div>\n</div>';});
+define('text!templates/heatmap_widget/heatspot.html',[],function () { return '<div style="position:absolute; border-style:solid; border-width:1px;">\r\n\t<div class="background" style="opacity:0; width: 100%; height: 100%; background-color: white;">\r\n\t</div>\r\n</div>';});

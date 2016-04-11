@@ -1,1 +1,1 @@
-define('text!templates/canvas_widget/abstract_node.html',[],function () { return '<div id="<%= id %>" class="node">\n</div>';});
+define('text!templates/canvas_widget/abstract_node.html',[],function () { return '<div id="<%= id %>" class="node">\r\n</div>';});
