@@ -15,6 +15,7 @@ define([
      * @param {String} entityId Entity id of the entity this activity works on
      * @param {number} offsetX Offset in x-direction
      * @param {number} offsetY Offset in y-direction
+     * @param {string} jabberId the jabberId of the user
      * @constructor
      */
     function NodeResizeOperation(entityId,offsetX,offsetY,jabberId){
@@ -111,7 +112,8 @@ define([
             return new NodeResizeOperation(
                 this.getEntityId(),
                 -this.getOffsetX(),
-                -this.getOffsetY()
+                -this.getOffsetY(),
+                this.getJabberId()
             );
         };
     }

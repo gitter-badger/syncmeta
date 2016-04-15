@@ -22,6 +22,7 @@ define([
     'canvas_widget/AbstractEntity',
     'canvas_widget/ModelAttributesNode',
     'canvas_widget/EntityManager',
+    'canvas_widget/HistoryManager',
     'canvas_widget/AbstractCanvas',
     'canvas_widget/MoveTool',
     'canvas_widget/guidance_modeling/GuidanceBox',
@@ -31,7 +32,7 @@ define([
     'canvas_widget/guidance_modeling/CollaborationGuidance',
     'jquery.transformable-PATCHED'
 ], /** @lends Canvas */
-function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelectOperation, EntitySelectOperation, ActivityOperation, ExportDataOperation, ExportMetaModelOperation,ExportLogicalGuidanceRepresentationOperation, ExportImageOperation,PerformCvgOperation, DeleteCvgOperation,ShowGuidanceBoxOperation,CanvasViewChangeOperation,RevokeSharedActivityOperation,MoveCanvasOperation,GuidanceStrategyOperation, AbstractEntity, ModelAttributesNode, EntityManager, AbstractCanvas, MoveTool, GuidanceBox,SelectToolGuidance, SetPropertyGuidance, GhostEdgeGuidance,CollaborationGuidance) {
+function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelectOperation, EntitySelectOperation, ActivityOperation, ExportDataOperation, ExportMetaModelOperation,ExportLogicalGuidanceRepresentationOperation, ExportImageOperation,PerformCvgOperation, DeleteCvgOperation,ShowGuidanceBoxOperation,CanvasViewChangeOperation,RevokeSharedActivityOperation,MoveCanvasOperation,GuidanceStrategyOperation, AbstractEntity, ModelAttributesNode, EntityManager, HistoryManager,AbstractCanvas, MoveTool, GuidanceBox,SelectToolGuidance, SetPropertyGuidance, GhostEdgeGuidance,CollaborationGuidance) {
 
     Canvas.prototype = new AbstractCanvas();
     Canvas.prototype.constructor = Canvas;
@@ -245,7 +246,7 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
             if (operation instanceof NodeAddOperation) {
                 _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.getOTOperation());
                 _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
-                if(operation.getViewId() === EntityManager.getViewId()) {
+                if(operation.getViewId() === EntityManager.getViewId() || EntityManager.getLayer() === CONFIG.LAYER.META) {
                     _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, new ActivityOperation(
                         "NodeAddActivity",
                         operation.getEntityId(),
@@ -317,7 +318,7 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
 
                 _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.getOTOperation());
 
-                if(operation.getViewId() === EntityManager.getViewId()) {
+                if(operation.getViewId() === EntityManager.getViewId() || EntityManager.getLayer() === CONFIG.LAYER.META) {
                     _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, new ActivityOperation(
                         "EdgeAddActivity",
                         operation.getEntityId(),
@@ -1452,30 +1453,31 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
                         case NodeAddOperation.TYPE:{
                             operation = new NodeAddOperation(data.id,data.type,data.left, data.top,data.width,data.height,data.zIndex,data.json,data.viewId,data.oType,jabberId);
                             remoteNodeAddCallback(operation);
+                            if(!data.historyFlag)
+                                HistoryManager.add(operation);
                             if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] === jabberId) {
                                 triggerSave = true;
                             }
                             break;
                         }
-                        case EdgeAddOperation.TYPE:
-                        {
+                        case EdgeAddOperation.TYPE:{
                             operation = new EdgeAddOperation(data.id, data.type, data.source, data.target, data.json, data.viewId, data.oType, jabberId);
                             remoteEdgeAddCallback(operation);
+                            if(!data.historyFlag)
+                                HistoryManager.add(operation);
                             if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] === jabberId) {
                                 triggerSave = true;
                             }
                             break;
                         }
-                        case RevokeSharedActivityOperation.TYPE:
-                        {
+                        case RevokeSharedActivityOperation.TYPE:{
                             if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== jabberId) {
                                 operation = new RevokeSharedActivityOperation(data.id);
                                 remoteRevokeSharedActivityOperationCallback(operation);
                             }
                             break;
                         }
-                        case remoteGuidanceStrategyOperation.TYPE:
-                        {
+                        case GuidanceStrategyOperation.TYPE:{
                             if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== jabberId) {
                                 operation = new GuidanceStrategyOperation(data.data);
                                 remoteGuidanceStrategyOperation(operation);

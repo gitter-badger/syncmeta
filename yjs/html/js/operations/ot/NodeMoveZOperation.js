@@ -14,6 +14,7 @@ define([
      * @extends operations.ot.EntityOperation
      * @param {String} entityId Entity id of the entity this activity works on
      * @param {number} offsetZ Offset in z-direction
+     * @param {string} jabberId the jabberId of the user
      * @constructor
      */
     function NodeMoveZOperation(entityId,offsetZ,jabberId){
@@ -21,14 +22,19 @@ define([
 
         EntityOperation.call(this,EntityOperation.TYPES.NodeMoveZOperation,entityId,CONFIG.ENTITY.NODE);
 
-        var _jabberId = jabberId;
-
         /**
          * Offset in y-direction
          * @type {number}
          * @private
          */
         var _offsetZ = offsetZ;
+
+        /**
+         * the jabberId
+         * @type {string}
+         * @private
+         */
+        var _jabberId = jabberId;
 
         /**
          * Create OTOperation for operation
@@ -93,7 +99,8 @@ define([
 
             return new NodeMoveZOperation(
                 this.getEntityId(),
-                -this.getOffsetZ()
+                -this.getOffsetZ(),
+                this.getJabberId()
             );
         };
     }

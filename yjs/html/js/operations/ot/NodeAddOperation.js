@@ -22,6 +22,7 @@ define([
      * @param {object} json JSON representation of node
      * @param {string} viewId the identifier of the view
      * @param {string} oType the original Type, only set in views
+     * @param {string} jabberId the jabberId of the user
      * @constructor
      */
     function NodeAddOperation(entityId,type,left,top,width,height,zIndex,json, viewId, oType,jabberId){
@@ -36,7 +37,12 @@ define([
          */
         var _viewId = viewId;
 
-        var _jabberId= jabberId;
+        /**
+         * the jabberId of the user
+         * @type {string}
+         * @private
+         */
+        var _jabberId = jabberId;
 
         var _oType = oType;
 
@@ -181,6 +187,10 @@ define([
           return _viewId;
         };
 
+        /**
+         * Get the jabberid
+         * @returns {string}
+         */
         this.getJabberId = function(){
             return _jabberId;
         };
@@ -252,7 +262,7 @@ define([
             json: this.getJSON(),
             viewId:this.getViewId(),
             oType: this.getOriginType(),
-            jabberId: this.getJabberId()
+            jabberId:this.getJabberId()
         }
     };
 

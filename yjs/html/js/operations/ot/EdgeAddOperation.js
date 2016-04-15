@@ -19,18 +19,19 @@ define([
      * @param {object} json JSON representation of edge
      * @param {string} viewId the identifier of the view
      * @param {string} oType oType the original Type, only set in views
+     * @param {string} jabberId the jabberId of the user
      * @constructor
      */
     function EdgeAddOperation(entityId,type,source,target,json, viewId,oType,jabberId){
         var that = this;
 
         var _oType = oType;
+
         var _jabberId = jabberId;
 
         this.getOriginType = function(){
           return _oType;
         };
-
 
         EntityOperation.call(this,EntityOperation.TYPES.EdgeAddOperation,entityId,CONFIG.ENTITY.EDGE);
 
@@ -123,15 +124,19 @@ define([
         };
 
         /**
+         * Get the jabber id
+         * @returns {string}
+         */
+        this.getJabberId = function(){
+            return _jabberId;
+        };
+
+        /**
          * Get JSON representation of edge
          * @return {Object}
          */
         this.getJSON = function(){
             return _json;
-        };
-
-        this.getJabberId =function(){
-            return _jabberId;
         };
 
         /**

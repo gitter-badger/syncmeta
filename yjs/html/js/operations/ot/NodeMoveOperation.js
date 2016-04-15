@@ -15,6 +15,7 @@ define([
      * @param {String} entityId Entity id of the entity this activity works on
      * @param {number} offsetX Offset in x-direction
      * @param {number} offsetY Offset in y-direction
+     * @param {string} jabberId the jabberId of the user
      * @constructor
      */
     function NodeMoveOperation(entityId,offsetX,offsetY,jabberId){
@@ -29,14 +30,19 @@ define([
          */
         var _offsetX = offsetX;
 
-        var _jabberId = jabberId;
-
         /**
          * Offset in y-direction
          * @type {number}
          * @private
          */
         var _offsetY = offsetY;
+
+        /**
+         * jabber id of the user
+         * @type {string}
+         * @private
+         */
+        var _jabberId = jabberId;
 
         /**
          * Create OTOperation for operation
@@ -63,16 +69,20 @@ define([
             return _offsetX;
         };
 
-        this.getJabberId = function(){
-            return _jabberId;
-        };
-
         /**
          * Get offset in y-direction
          * @returns {number}
          */
         this.getOffsetY = function(){
             return _offsetY;
+        };
+
+        /**
+         * Get the JabberId
+         * @returns {string}
+         */
+        this.getJabberId = function(){
+            return _jabberId;
         };
 
         /**
@@ -111,7 +121,8 @@ define([
             return new NodeMoveOperation(
                 this.getEntityId(),
                 -this.getOffsetX(),
-                -this.getOffsetY()
+                -this.getOffsetY(),
+                this.getJabberId()
             );
         };
     }
@@ -132,7 +143,7 @@ define([
             id:this.getEntityId(),
             offsetX:this.getOffsetX(),
             offsetY:this.getOffsetY(),
-            jabberId: this.getJabberId()
+            jabberId:this.getJabberId()
         }
     };
 

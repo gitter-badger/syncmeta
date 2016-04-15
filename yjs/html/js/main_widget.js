@@ -48,10 +48,11 @@ requirejs([
     'canvas_widget/ViewRelationshipNodeTool',
     'canvas_widget/ViewManager',
     'canvas_widget/ViewGenerator',
+    'canvas_widget/HistoryManager',
     'promise!Metamodel',
     'promise!Model',
     'promise!Guidancemodel'
-],function($,jsPlumb,IWCW, yjsSync,Util,ToolSelectOperation,ActivityOperation,JoinOperation, ViewInitOperation, UpdateViewListOperation, DeleteViewOperation,SetViewTypesOperation, InitModelTypesOperation, SetModelAttributeNodeOperation, Canvas,EntityManager,NodeTool,ObjectNodeTool,AbstractClassNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,EdgeTool,GeneralisationEdgeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,ObjectNode,AbstractClassNode,RelationshipNode,RelationshipGroupNode,EnumNode,NodeShapeNode,EdgeShapeNode,GeneralisationEdge,BiDirAssociationEdge,UniDirAssociationEdge, ViewObjectNode, ViewObjectNodeTool,ViewRelationshipNode, ViewRelationshipNodeTool, ViewManager, ViewGenerator,metamodel,model,guidancemodel) {
+],function($,jsPlumb,IWCW, yjsSync,Util,ToolSelectOperation,ActivityOperation,JoinOperation, ViewInitOperation, UpdateViewListOperation, DeleteViewOperation,SetViewTypesOperation, InitModelTypesOperation, SetModelAttributeNodeOperation, Canvas,EntityManager,NodeTool,ObjectNodeTool,AbstractClassNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,EdgeTool,GeneralisationEdgeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,ObjectNode,AbstractClassNode,RelationshipNode,RelationshipGroupNode,EnumNode,NodeShapeNode,EdgeShapeNode,GeneralisationEdge,BiDirAssociationEdge,UniDirAssociationEdge, ViewObjectNode, ViewObjectNodeTool,ViewRelationshipNode, ViewRelationshipNodeTool, ViewManager, ViewGenerator, HistoryManager,metamodel,model,guidancemodel) {
 
     var _iwcw;
     _iwcw = IWCW.getInstance(CONFIG.WIDGET.NAME.MAIN);
@@ -86,7 +87,15 @@ requirejs([
                     //TODO
                     //_iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.toNonOTOperation());
 
-                    JSONtoGraph(model);
+                    JSONtoGraph(model).done(function(stats){
+                        console.info(stats);
+                        $("#loading").hide();
+                        canvas.resetTool();
+                        if(CONFIG.TEST_MODE)
+                            require(['./../test/CanvasWidgetTest'], function(CanvasWidgetTest){
+                                CanvasWidgetTest(canvas);
+                            });
+                    });
 
                     if (canvas.getModelAttributesNode() === null) {
                         var modelAttributesNode = EntityManager.createModelAttributesNode();
@@ -474,6 +483,7 @@ requirejs([
             //return deferred.promise();
         };
         function JSONtoGraph(json){
+            var deferred = $.Deferred();
             function createModelAttributeCallback(map){
                 var promises = [];
                 var modelAttributesNode = EntityManager.createModelAttributesNodeFromJSON(json.attributes);
@@ -703,38 +713,37 @@ requirejs([
             if(numberOfNodes>0) {
                 createNodes(json.nodes).then(null, null, function (createdNodes) {
                     if (createdNodes === numberOfNodes) {
-                        //canvas.resetTool();
-                        console.info('SYNCMETA:Created nodes:' + createdNodes);
                         if (numberOfEdges > 0) {
                             registerEdges(json.edges).then(null, null, function (createdEdges) {
                                 if (createdEdges === numberOfEdges) {
                                     canvas.resetTool();
-                                    console.info('SYNCMETA:Created Edges: ' + createdEdges);
-                                    $("#loading").hide();
+                                    deferred.resolve('SYNCMETA:Created nodes:' + createdNodes +'Created Edges: ' + createdEdges);
+
                                 }
-                            })
-                        } else {
-                            canvas.resetTool();
-                            $("#loading").hide();
-                        }
+                            });
+                        } else
+                            deferred.resolve('SYNCMETA:Created nodes:' + createdNodes);
                     }
                 });
-            }else{
-                canvas.resetTool();
-                $("#loading").hide();
-            }
+            }else
+                deferred.resolve('SYNCMETA: Model is empty');
+            return deferred.promise();
         }
 
         var $undo = $("#undo");
         var $redo = $("#redo");
 
         $undo.click(function () {
-            _iwcw.undo();
-        }).prop('disabled', true);
+            HistoryManager.undo();
+        });
+        if(y.share.undo.length === 0)
+            $undo.prop('disabled', true);
 
         $redo.click(function () {
-            _iwcw.redo();
-        }).prop('disabled', true);
+            HistoryManager.redo();
+        });
+        if(y.share.redo.length === 0)
+            $redo.prop('disabled', true);
 
 
         $("#q").draggable({
