@@ -105,8 +105,9 @@ define([
                             nodeId;
 
                         //noinspection JSAccessibilityCheck
-                        nodeId = canvas.createNode(NodeShapeNode.TYPE,appearance.left + appearance.width + 50,appearance.top,150,100);
-                        canvas.createEdge(BiDirAssociationEdge.TYPE,that.getEntityId(),nodeId);
+                        canvas.createNode(NodeShapeNode.TYPE,appearance.left + appearance.width + 50,appearance.top,150,100).done(function(nodeId){
+                            canvas.createEdge(BiDirAssociationEdge.TYPE,that.getEntityId(),nodeId);
+                        });
                     },
                     disabled: function() {
                         var edges = that.getEdges(),

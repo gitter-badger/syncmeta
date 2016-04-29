@@ -1,1 +1,1 @@
-define('text!templates/canvas_widget/viewobject_node.html',[],function () { return '<div class="class_node">\r\n    <div class="type"><%= type %></div>\r\n    <div class="label">&lt;&lt;ViewObject&gt;&gt;</div>\r\n    <div class="attributes"></div>\r\n</div>';});
+define('text!templates/canvas_widget/viewobject_node.html',[],function () { return '<div class="class_node">\n    <div class="type"><%= type %></div>\n    <div class="label">&lt;&lt;ViewObject&gt;&gt;</div>\n    <div class="attributes"></div>\n</div>';});

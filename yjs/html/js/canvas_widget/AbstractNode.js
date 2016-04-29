@@ -10,14 +10,13 @@ define([
     'operations/ot/NodeMoveZOperation',
     'operations/ot/NodeResizeOperation',
     'operations/non_ot/ActivityOperation',
-    'operations/non_ot/EntitySelectOperation',
     'canvas_widget/AbstractEntity',
     'canvas_widget/SingleValueAttribute',
     'canvas_widget/HistoryManager',
     'text!templates/canvas_widget/abstract_node.html',
     'text!templates/canvas_widget/awareness_trace.html',
     'jquery.transformable-PATCHED'
-],/** @lends AbstractNode */function(require,$,jsPlumb,_,Util,IWCW,NodeDeleteOperation,NodeMoveOperation,NodeMoveZOperation,NodeResizeOperation,ActivityOperation,EntitySelectOperation,AbstractEntity,SingleValueAttribute,HistoryManager,abstractNodeHtml,awarenessTraceHtml) {
+],/** @lends AbstractNode */function(require,$,jsPlumb,_,Util,IWCW,NodeDeleteOperation,NodeMoveOperation,NodeMoveZOperation,NodeResizeOperation,ActivityOperation,AbstractEntity,SingleValueAttribute,HistoryManager,abstractNodeHtml,awarenessTraceHtml) {
 
     AbstractNode.prototype = new AbstractEntity();
     AbstractNode.prototype.constructor = AbstractNode;
@@ -39,7 +38,7 @@ define([
         var that = this;
 
         /**y-map instances which belongs to the node
-         * @type {y-map}
+         * @type {Y.Map}
          * @private
          * */
         var _ymap = null;
@@ -127,20 +126,6 @@ define([
         var _isSelected = false;
 
         /**
-         * Stores current highlighting color
-         * @type {string}
-         * @private
-         */
-        var _highlightColor = null;
-
-        /**
-         * Stores current highlighting user name
-         * @type {string}
-         * @private
-         */
-        var _highlightUsername = null;
-
-        /**
          * Callback to generate list of context menu items
          * @type {function}
          */
@@ -201,6 +186,9 @@ define([
          */
         var propagateNodeMoveOperation = function(operation){
             processNodeMoveOperation(operation);
+            HistoryManager.add(operation);
+            $('#save').click();
+
             hideTraceAwareness();
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
@@ -221,6 +209,7 @@ define([
          */
         var propagateNodeMoveZOperation = function(operation){
             processNodeMoveZOperation(operation);
+            HistoryManager.add(operation);
             hideTraceAwareness();
             //if(_iwcw.sendRemoteOTOperation(operation)){
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
@@ -251,6 +240,8 @@ define([
          */
         var propagateNodeResizeOperation = function(operation){
             processNodeResizeOperation(operation);
+            HistoryManager.add(operation);
+            $('#save').click();
             hideTraceAwareness();
             //if(_iwcw.sendRemoteOTOperation(operation)){
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
@@ -299,6 +290,8 @@ define([
          * @param {operations.ot.NodeDeleteOperation} operation
          */
         var propagateNodeDeleteOperation = function(operation){
+            HistoryManager.add(operation);
+            $('#save').click();
             processNodeDeleteOperation(operation);
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
@@ -311,43 +304,6 @@ define([
                 {}
             ).toNonOTOperation());
 
-        };
-
-        /**
-         * Callback for a remote Entity Select Operation
-         * @param {EntitySelectOperation} operation
-         */
-        var remoteEntitySelectCallback = function(operation){
-            var senderJabberId,
-                color,
-                username;
-
-            if(operation instanceof EntitySelectOperation){
-                senderJabberId = operation.getJabberId();
-                if(senderJabberId === _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID])
-                    return;
-                color = _iwcw.getUserColor(senderJabberId);
-                username = _iwcw.getMembers()[senderJabberId][CONFIG.NS.PERSON.TITLE];
-                if(!_isSelected){
-                    if(operation.getSelectedEntityId() === that.getEntityId()){
-                        _highlightColor = color;
-                        _highlightUsername = username;
-                        that.highlight(color,username);
-                    } else {
-                        _highlightColor = null;
-                        _highlightUsername = null;
-                        that.unhighlight();
-                    }
-                } else {
-                    if(operation.getSelectedEntityId() === that.getEntityId()){
-                        _highlightColor = color;
-                        _highlightUsername = username;
-                    } else {
-                        _highlightColor = null;
-                        _highlightUsername = null;
-                    }
-                }
-            }
         };
 
         var refreshTraceAwareness = function(color){
@@ -379,10 +335,16 @@ define([
                     NodeMoveOperation.getOperationDescription(that.getType(),that.getLabel().getValue().getValue()),
                     {nodeType: that.getType()}
                 ).toNonOTOperation());
-                if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()) {
-                    color = _iwcw.getUserColor(operation.getJabberId());
+
+                /*if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()) {
+                 color = _iwcw.getUserColor(operation.getJabberId());
+                 refreshTraceAwareness(color);
+                 }*/
+                if(y.share.users.get(y.db.userId) !== operation.getJabberId()){
+                    var color = Util.getColor(y.share.userList.get(operation.getJabberId()).globalId);
                     refreshTraceAwareness(color);
                 }
+
                 processNodeMoveOperation(operation);
             }
         };
@@ -402,8 +364,13 @@ define([
                     NodeMoveOperation.getOperationDescription(that.getType(),that.getLabel().getValue().getValue()),
                     {nodeType: that.getType()}
                 ).toNonOTOperation());
-                if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()) {
-                    var color = _iwcw.getUserColor(operation.getJabberId());
+
+                /*if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()) {
+                 var color = _iwcw.getUserColor(operation.getJabberId());
+                 refreshTraceAwareness(color);
+                 }*/
+                if(y.share.users.get(y.db.userId) !== operation.getJabberId()){
+                    var color = Util.getColor(y.share.userList.get(operation.getJabberId()).globalId);
                     refreshTraceAwareness(color);
                 }
                 processNodeMoveZOperation(operation);
@@ -426,8 +393,12 @@ define([
                     NodeResizeOperation.getOperationDescription(that.getType(),that.getLabel().getValue().getValue()),
                     {nodeType: that.getType()}
                 ).toNonOTOperation());
-                if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()) {
-                    var color = _iwcw.getUserColor(operation.getJabberId());
+                /*if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()) {
+                 var color = _iwcw.getUserColor(operation.getJabberId());
+                 refreshTraceAwareness(color);
+                 }*/
+                if(y.share.users.get(y.db.userId) !== operation.getJabberId()){
+                    var color = Util.getColor(y.share.userList.get(operation.getJabberId()).globalId);
                     refreshTraceAwareness(color);
                 }
                 processNodeResizeOperation(operation);
@@ -441,8 +412,8 @@ define([
         var remoteNodeDeleteCallback = function(operation){
             var jabberId = y.share.users.get(_ymap.map[NodeDeleteOperation.TYPE][0]);
 
-            if(jabberId !== _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID])
-                y.share.nodes.delete(operation.getEntityId());
+            //if(jabberId !== _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID])
+            //    y.share.nodes.delete(operation.getEntityId());
 
             if(operation instanceof NodeDeleteOperation && operation.getEntityId() === that.getEntityId()){
                 _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
@@ -455,57 +426,6 @@ define([
                     NodeDeleteOperation.getOperationDescription(that.getType(),that.getLabel().getValue().getValue()),
                     {}
                 ).toNonOTOperation());
-                processNodeDeleteOperation(operation);
-            }
-        };
-
-        /**
-         * Callback for an undone resp. redone Node Move Operation
-         * @param {operations.ot.NodeMoveOperation} operation
-         */
-        var historyNodeMoveCallback = function(operation){
-            if(operation instanceof NodeMoveOperation && operation.getEntityId() === that.getEntityId()){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
-                processNodeMoveOperation(operation);
-            }
-        };
-
-        /**
-         * Callback for an undone resp. redone Node Move Operation
-         * @param {operations.ot.NodeMoveZOperation} operation
-         */
-        var historyNodeMoveZCallback = function(operation){
-            if(operation instanceof NodeMoveZOperation && operation.getEntityId() === that.getEntityId()){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
-                processNodeMoveZOperation(operation);
-            }
-        };
-
-        /**
-         * Callback for an undone resp. redone Node Resize Operation
-         * @param {operations.ot.NodeResizeOperation} operation
-         */
-        var historyNodeResizeCallback = function(operation){
-            if(operation instanceof NodeResizeOperation && operation.getEntityId() === that.getEntityId()){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
-                processNodeResizeOperation(operation);
-            }
-        };
-
-        /**
-         * Callback for an undone resp. redone Node Delete Operation
-         * @param {operations.ot.NodeDeleteOperation} operation
-         */
-        var historyNodeDeleteCallback = function(operation){
-            if(operation instanceof NodeDeleteOperation && operation.getEntityId() === that.getEntityId()){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
                 processNodeDeleteOperation(operation);
             }
         };
@@ -546,6 +466,7 @@ define([
                                     var operation = new NodeMoveZOperation(that.getEntityId(),--AbstractEntity.minZIndex-_zIndex);
                                     if(_ymap){
                                         _ymap.set('zIndex', zIndex + operation.getOffsetZ());
+                                        propagateNodeMoveZOperation(operation);
                                         _ymap.set(NodeMoveZOperation.TYPE,operation.toJSON());
                                     }
                                     else {
@@ -633,6 +554,7 @@ define([
             var operation = new NodeDeleteOperation(id,that.getType(),_appearance.left,_appearance.top,_appearance.width,_appearance.height,_zIndex,that.toJSON());
             if(_ymap){
                 _ymap.set(NodeDeleteOperation.TYPE, operation.toJSON());
+                propagateNodeDeleteOperation(operation);
             }
             else {
                 propagateNodeDeleteOperation(operation);
@@ -1004,7 +926,7 @@ define([
          */
         this.unselect = function(){
             _isSelected = false;
-             this.highlight(_highlightColor,_highlightUsername);
+            //this.highlight(_highlightColor,_highlightUsername);
             _$node.removeClass("selected");
             Util.delay(100).then(function(){
                 _.each(require('canvas_widget/EntityManager').getEdges(),function(e){
@@ -1019,17 +941,10 @@ define([
          * @param {String} username
          */
         this.highlight = function(color,username){
+            //unhighlight everything else
+            //$('.node:not(.selected)').css({border: "2px solid transparent"});
+            //$('.user_highlight').remove();
             if(color && username){
-
-                //unhighlight everything else
-                $('.node').css({border: "2px solid transparent"});
-                $('.user_highlight').remove();
-
-                //Or
-
-
-
-
                 _$node.css({border: "2px solid " + color});
                 _$node.append($('<div></div>').addClass('user_highlight').css('color',color).text(username));
                 Util.delay(100).then(function(){_.each(require('canvas_widget/EntityManager').getEdges(),function(e){e.setZIndex();});});
@@ -1145,6 +1060,7 @@ define([
                             if(_ymap){
                                 _ymap.set('width',_appearance.width +offsetX);
                                 _ymap.set('height',_appearance.height+offsetY);
+                                propagateNodeResizeOperation(operation);
                                 _ymap.set('NodeResizeOperation', operation.toJSON());
                             }
                         }
@@ -1196,6 +1112,7 @@ define([
                         if(_ymap){
                             _ymap.set('top', _appearance.top + offsetY);
                             _ymap.set('left',_appearance.left+offsetX);
+                            propagateNodeMoveOperation(operation);
                             _ymap.set(NodeMoveOperation.TYPE,operation.toJSON());
                         }
                         else {
@@ -1290,9 +1207,7 @@ define([
             jsPlumb.unmakeTarget(_$node);
         };
 
-
         that.init();
-
 
         this.getYMap = function(){
             return _ymap;
@@ -1300,57 +1215,40 @@ define([
 
         this._registerYMap = function(ymap) {
             _ymap = ymap;
-            _ymap.observe(function (events) {
-                var triggerSave = false;
-                for (var i in events) {
-                    var event = events[i];
+            _ymap.observe(function (event) {
+                var yUserId = event.object.map[event.name][0];
+
+                if (y.db.userId !== yUserId || event.value.historyFlag) {
                     var operation;
-                    var data = _ymap.get(event.name);
-                    var jabberId = y.share.users.get(event.object.map[event.name][0]);
-
-                    if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] === jabberId && event.name !== EntitySelectOperation.TYPE) {
-                        triggerSave = true;
-                    }
-
-                    switch (event.name){
-                        case NodeDeleteOperation.TYPE:{
-                            operation = new NodeDeleteOperation(data.id,data.type,data.left, data.top,data.width,data.height,data.zIndex,data.json);
+                    var data = event.value;
+                    var jabberId = y.share.users.get(yUserId);
+                    switch (event.name) {
+                        case NodeDeleteOperation.TYPE:
+                        {
+                            operation = new NodeDeleteOperation(data.id, data.type, data.left, data.top, data.width, data.height, data.zIndex, data.json);
                             remoteNodeDeleteCallback(operation);
-                            if(!data.historyFlag)
-                                HistoryManager.add(operation);
                             break;
                         }
-                        case NodeMoveOperation.TYPE:{
+                        case NodeMoveOperation.TYPE:
+                        {
                             operation = new NodeMoveOperation(data.id, data.offsetX, data.offsetY, jabberId);
                             remoteNodeMoveCallback(operation);
-                            if(!data.historyFlag)
-                                HistoryManager.add(operation);
                             break;
                         }
-                        case NodeMoveZOperation.TYPE:{
-                            operation =  new NodeMoveZOperation(data.id,data.offsetZ, jabberId);
+                        case NodeMoveZOperation.TYPE:
+                        {
+                            operation = new NodeMoveZOperation(data.id, data.offsetZ, jabberId);
                             remoteNodeMoveZCallback(operation);
-                            if(!data.historyFlag)
-                                HistoryManager.add(operation);
                             break;
                         }
-                        case NodeResizeOperation.TYPE:{
-                            operation = new NodeResizeOperation(data.id, data.offsetX, data.offsetY,jabberId);
+                        case NodeResizeOperation.TYPE:
+                        {
+                            operation = new NodeResizeOperation(data.id, data.offsetX, data.offsetY, jabberId);
                             remoteNodeResizeCallback(operation);
-                            if(!data.historyFlag)
-                                HistoryManager.add(operation);
-                            break;
-                        }
-                        case EntitySelectOperation.TYPE:{
-                            operation = new EntitySelectOperation(data.selectedEntityId, data.selectedEntityType, jabberId);
-                            remoteEntitySelectCallback(operation);
                             break;
                         }
                     }
                 }
-                if(triggerSave)
-                    $('#save').click();
-
             });
         };
     }

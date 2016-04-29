@@ -132,28 +132,40 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
         /**
          * Apply a Node Add Operation
          * @param {operations.ot.NodeAddOperation} operation
-         * @param {boolean} isRemote
+         * @param {Y.Map} ymap
          */
-        var processNodeAddOperation = function(operation){
+        var processNodeAddOperation = function(operation,ymap){
             var node;
             if (operation.getJSON()) {
                 node = EntityManager.createNodeFromJSON(operation.getType(), operation.getEntityId(), operation.getLeft(), operation.getTop(), operation.getWidth(), operation.getHeight(), operation.getZIndex(), operation.getJSON());
             } else {
                 node = EntityManager.createNode(operation.getType(), operation.getEntityId(), operation.getLeft(), operation.getTop(), operation.getWidth(), operation.getHeight(), operation.getZIndex());
             }
-            if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()){
-                var color = _iwcw.getUserColor(operation.getJabberId());
+
+            if(y.share.users.get(y.db.userId) !== operation.getJabberId()){
+                var color = Util.getColor(y.share.userList.get(operation.getJabberId()).globalId);
                 node.refreshTraceAwareness(color);
             }
+            /*
+             if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()){
+             var color = _iwcw.getUserColor(operation.getJabberId());
+             node.refreshTraceAwareness(color);
+             }*/
 
             if(y){
-                y.share.nodes.get(node.getEntityId()).then(function(map){
-                    node.registerYMap(map);
-
+                if(ymap){
+                    node.registerYMap(ymap);
                     node.draw();
                     node.addToCanvas(that);
                     that.remountCurrentTool();
-                });
+                }else {
+                    y.share.nodes.get(node.getEntityId()).then(function (map) {
+                        node.registerYMap(map);
+                        node.draw();
+                        node.addToCanvas(that);
+                        that.remountCurrentTool();
+                    });
+                }
             }
             else {
                 node.draw();
@@ -165,10 +177,12 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
         /**
          * Propagate a Node Add Operation to the remote users and the local widgets
          * @param {operations.ot.NodeAddOperation} operation
+         * @param {Y.Map} ymap
          */
-        var propagateNodeAddOperation = function (operation) {
-            processNodeAddOperation(operation);
-
+        var propagateNodeAddOperation = function (operation, ymap) {
+            processNodeAddOperation(operation,ymap);
+            HistoryManager.add(operation);
+            $('#save').click();
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
@@ -184,8 +198,9 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
         /**
          * Apply an Edge Add Operation
          * @param {operations.ot.EdgeAddOperation} operation
+         * @param {Y.Map} ymap
          */
-        var processEdgeAddOperation = function (operation) {
+        var processEdgeAddOperation = function (operation,ymap) {
             var edge;
 
             if (operation.getJSON()) {
@@ -195,12 +210,20 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
             }
 
             if(y){
-                y.share.edges.get(edge.getEntityId()).then(function(map){
-                    edge.registerYMap(map);
+                if(ymap) {
+                    edge.registerYMap(ymap);
                     edge.connect();
                     edge.addToCanvas(that);
                     that.remountCurrentTool();
-                })
+                }
+                else {
+                    y.share.edges.get(edge.getEntityId()).then(function (map) {
+                        edge.registerYMap(map);
+                        edge.connect();
+                        edge.addToCanvas(that);
+                        that.remountCurrentTool();
+                    })
+                }
             }else {
                 edge.connect();
                 edge.addToCanvas(that);
@@ -211,12 +234,16 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
         /**
          * Propagate an Edge Add Operation to the remote users and the local widgets
          * @param {operations.ot.EdgeAddOperation} operation
+         * @param {Y.Map} ymap
          */
-        var propagateEdgeAddOperation = function (operation) {
+        var propagateEdgeAddOperation = function (operation,ymap) {
             var sourceNode = EntityManager.findNode(operation.getSource());
             var targetNode = EntityManager.findNode(operation.getTarget());
 
-            processEdgeAddOperation(operation);
+
+            processEdgeAddOperation(operation,ymap);
+            HistoryManager.add(operation);
+            $('#save').click();
 
             //if(_iwcw.sendRemoteOTOperation(operation)){
             _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
@@ -288,15 +315,48 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
                         node = EntityManager.createNode(type, operation.getEntityId(), operation.getLeft(), operation.getTop(), operation.getWidth(), operation.getHeight(), operation.getZIndex());
                     }
 
-                    node.draw();
-                    node.addToCanvas(that);
 
-                    //if we are in a view but the view type got no mapping in this view -> hide the element
-                    if(!viewType && EntityManager.getViewId()){
-                        node.hide();
+                    if(y){
+                        y.share.nodes.get(node.getEntityId()).then(function(map){
+                            node.registerYMap(map);
+
+                            node.draw();
+                            node.addToCanvas(that);
+                            //if we are in a view but the view type got no mapping in this view -> hide the element
+                            if(!viewType && EntityManager.getViewId()){
+                                node.hide();
+                            }else{
+                                /*if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()){
+                                 var color = _iwcw.getUserColor(operation.getJabberId());
+                                 node.refreshTraceAwareness(color);
+                                 }*/
+                                if(y.share.users.get(y.db.userId) !== operation.getJabberId()){
+                                    var color = Util.getColor(y.share.userList.get(operation.getJabberId()).globalId);
+                                    node.refreshTraceAwareness(color);
+                                }
+                            }
+                            that.remountCurrentTool();
+                        });
                     }
-                    that.remountCurrentTool();
-
+                    else {
+                        node.draw();
+                        node.addToCanvas(that);
+                        //if we are in a view but the view type got no mapping in this view -> hide the element
+                        if(!viewType && EntityManager.getViewId()){
+                            node.hide();
+                        }else{
+                            /*
+                             if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== operation.getJabberId()){
+                             var color = _iwcw.getUserColor(operation.getJabberId());
+                             node.refreshTraceAwareness(color);
+                             }*/
+                            if(y.share.users.get(y.db.userId) !== operation.getJabberId()){
+                                var color = Util.getColor(y.share.userList.get(operation.getJabberId()).globalId);
+                                node.refreshTraceAwareness(color);
+                            }
+                        }
+                        that.remountCurrentTool();
+                    }
                 }
             }
         };
@@ -493,28 +553,6 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
          * Callback for an undone resp. redone Node Add Operation
          * @param {operations.ot.NodeAddOperation} operation
          */
-
-        var historyNodeAddCallback = function(operation){
-            if(operation instanceof NodeAddOperation){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.HEATMAP,operation.getOTOperation());
-                processNodeAddOperation(operation);
-            }
-        };
-
-        /**
-         * Callback for an undone resp. redone Edge Add Operation
-         * @param {operations.non_ot.EdgeAddOperation} operation
-         */
-
-        var historyEdgeAddCallback = function(operation){
-            if(operation instanceof EdgeAddOperation){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.getOTOperation());
-                processEdgeAddOperation(operation);
-            }
-        };
 
         var init = function () {
             var $canvasFrame = _$node.parent();
@@ -819,17 +857,19 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
                 if (entity)
                     entity.select();
             }
+
             var operation = new EntitySelectOperation(entity ? entity.getEntityId() : null, entity ? entity.getType() : null,_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
+
             _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.toNonOTOperation());
             _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY,operation.toNonOTOperation());
             _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.GUIDANCE,operation.toNonOTOperation());
 
             if(entity === null) {
-                if(_selectedEntity)
-                    _selectedEntity.getYMap().set(EntitySelectOperation.TYPE, operation.toJSON());
+                y.share.select.set(y.db.userId, null);
             }
             else {
-                entity.getYMap().set(EntitySelectOperation.TYPE, operation.toJSON());
+                y.share.select.set(y.db.userId,entity.getEntityId());
+
 
             }
             _selectedEntity = entity;
@@ -896,8 +936,8 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
             else {
                 ghostEdgeGuidance.addEdge(EntityManager.getEdgeType(relationshipType), source, target);
             }
-            for(var i = 0; i < _ghostEdges.length; i++){
-                _ghostEdges[i].show();
+            for(var j = 0; j < _ghostEdges.length; j++){
+                _ghostEdges[j].show();
             }
         };
 
@@ -961,7 +1001,8 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
          * @return {number} id of new node
          */
         this.createNode = function (type, left, top, width, height, zIndex, json, identifier) {
-            var id, oType = null;
+            var  id, oType = null;
+            var deferred = $.Deferred();
             if(identifier)
                 id = identifier;
             else
@@ -971,8 +1012,7 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
             if(EntityManager.getViewId() !== null && EntityManager.getLayer() === CONFIG.LAYER.MODEL){
                 oType = EntityManager.getViewNodeType(type).getTargetNodeType().TYPE;
             }
-            var operation = new NodeAddOperation(id, type, left, top, width, height, zIndex, json || null, EntityManager.getViewId(), oType);
-
+            var operation = new NodeAddOperation(id, type, left, top, width, height, zIndex, json || null, EntityManager.getViewId(), oType, _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
             if(y){
                 y.share.nodes.set(id, Y.Map).then(function(map){
                     //create the label element of the node
@@ -984,24 +1024,32 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
 
                     if(EntityManager.getLayer() === CONFIG.LAYER.META) {
                         map.set(id + "[label]", Y.Text).then(function () {
+                            var attrColorPromise;
                             if (type === 'Node Shape') {
-                                var attrColorPromise = createYTypeForValueOfAttribute(map, id + "[color]", Y.Text);
+                                attrColorPromise = createYTypeForValueOfAttribute(map, id + "[color]", Y.Text);
                                 var attrAnchorsPromise = createYTypeForValueOfAttribute(map, id + "[customAnchors]", Y.Text);
                                 var attrCustomShapePromise = createYTypeForValueOfAttribute(map, id + "[customShape]", Y.Text);
                                 $.when(attrColorPromise, attrAnchorsPromise, attrCustomShapePromise).done(function () {
+                                    propagateNodeAddOperation(operation,map);
                                     y.share.canvas.set(NodeAddOperation.TYPE, operation.toJSON());
+                                    deferred.resolve(id);
                                 });
                             }
                             else if (type === 'Edge Shape') {
-                                var attrColorPromise = createYTypeForValueOfAttribute(map, id + "[color]", Y.Text);
+                                attrColorPromise = createYTypeForValueOfAttribute(map, id + "[color]", Y.Text);
                                 var attrOverlayPromise = createYTypeForValueOfAttribute(map, id + "[overlay]", Y.Text);
-
                                 $.when(attrColorPromise, attrOverlayPromise).done(function () {
+                                    propagateNodeAddOperation(operation,map);
                                     y.share.canvas.set(NodeAddOperation.TYPE, operation.toJSON());
+                                    deferred.resolve(id);
+
                                 });
                             }
                             else {
+                                propagateNodeAddOperation(operation,map);
                                 y.share.canvas.set(NodeAddOperation.TYPE, operation.toJSON());
+                                deferred.resolve(id);
+
                             }
                         });
                     }
@@ -1016,18 +1064,25 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
                         }
                         if(attrPromises.length > 0) {
                             $.when.apply(null, attrPromises).done(function () {
+                                propagateNodeAddOperation(operation,map);
                                 y.share.canvas.set(NodeAddOperation.TYPE, operation.toJSON());
+                                deferred.resolve(id);
+
                             });
                         }
                         else {
+                            propagateNodeAddOperation(operation,map);
                             y.share.canvas.set(NodeAddOperation.TYPE, operation.toJSON());
+                            deferred.resolve(id);
+
                         }
                     }
                 })
             }else {
                 propagateNodeAddOperation(operation);
+                deferred.resolve(id);
             }
-            return id;
+            return deferred.promise();
         };
 
         /**
@@ -1041,6 +1096,7 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
          */
         this.createEdge = function (type, source, target, json, identifier) {
             var id = null, oType = null;
+            var deferred = $.Deferred();
             if(identifier)
                 id = identifier;
             else
@@ -1048,11 +1104,39 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
             if(EntityManager.getViewId() !== null && EntityManager.getLayer() === CONFIG.LAYER.MODEL){
                 oType = EntityManager.getViewEdgeType(type).getTargetEdgeType().TYPE;
             }
-            var operation = new EdgeAddOperation(id, type, source, target, json || null, EntityManager.getViewId(), oType);
+            var operation = new EdgeAddOperation(id, type, source, target, json || null, EntityManager.getViewId(), oType,  _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
             if(y){
                 y.share.edges.set(id, Y.Map).then(function(map){
                     map.set(id+"[label]", Y.Text).then(function() {
-                        y.share.canvas.set(EdgeAddOperation.TYPE, operation.toJSON());
+                        if(EntityManager.getLayer()=== CONFIG.LAYER.MODEL){
+                            var attributes = EntityManager.getEdgeType(type).getAttributes();
+                            var attrPromises = [];
+                            for(var attrKey in attributes){
+                                if(attributes.hasOwnProperty(attrKey)&& attributes[attrKey].value === 'string'){
+                                    var attrId =  id+'['+attributes[attrKey].key+']';
+                                    attrPromises.push(createYTypeForValueOfAttribute(map,attrId.toLowerCase(), Y.Text));
+                                }
+                            }
+                            if(attrPromises.length > 0) {
+                                $.when.apply(null, attrPromises).done(function () {
+                                    propagateEdgeAddOperation(operation,map);
+                                    y.share.canvas.set(EdgeAddOperation.TYPE, operation.toJSON());
+                                    deferred.resolve(id);
+
+                                });
+                            }
+                            else {
+                                propagateEdgeAddOperation(operation,map);
+                                y.share.canvas.set(EdgeAddOperation.TYPE, operation.toJSON());
+                                deferred.resolve(id);
+
+                            }
+                        }
+                        else{
+                            propagateEdgeAddOperation(operation,map);
+                            y.share.canvas.set(EdgeAddOperation.TYPE, operation.toJSON());
+                            deferred.resolve(id);
+                        }
                     });
                     map.set('id',id);
                     map.set('source', source);
@@ -1061,8 +1145,9 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
                 })
             } else {
                 propagateEdgeAddOperation(operation);
+                deferred.resolve(id);
             }
-            return id;
+            return deferred.promise();
         };
 
         this.scrollNodeIntoView  = function(nodeId){
@@ -1412,7 +1497,7 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
         /**
          * visualizes the results of a CVG operation.
          * CVG is computed on the attribute widget
-         * @param {operation.non_ot.PerformCvgOperation} operation
+         * @param {operations.non_ot.PerformCvgOperation} operation
          * @constructor
          */
         function CvgCallback(operation){
@@ -1441,55 +1526,61 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
         init();
 
         if(y){
-            y.share.canvas.observe(function(events){
-                var triggerSave = false;
-                for(var i in events){
-                    var event =events[i];
-                    var operation;
-                    var data = y.share.canvas.get(event.name);
-                    var jabberId = y.share.users.get(event.object.map[event.name][0]);
+            y.share.canvas.observe(function(event){
+                var yUserId = event.object.map[event.name][0];
 
-                    switch(event.name){
-                        case NodeAddOperation.TYPE:{
-                            operation = new NodeAddOperation(data.id,data.type,data.left, data.top,data.width,data.height,data.zIndex,data.json,data.viewId,data.oType,jabberId);
+                if(yUserId !== y.db.userId || event.value.historyFlag) {
+                    var jabberId = y.share.users.get(yUserId);
+                    var operation;
+                    var data = event.value;
+                    switch (event.name) {
+                        case NodeAddOperation.TYPE:
+                        {
+                            operation = new NodeAddOperation(data.id, data.type, data.left, data.top, data.width, data.height, data.zIndex, data.json, data.viewId, data.oType, jabberId);
                             remoteNodeAddCallback(operation);
-                            if(!data.historyFlag)
-                                HistoryManager.add(operation);
-                            if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] === jabberId) {
-                                triggerSave = true;
-                            }
                             break;
                         }
-                        case EdgeAddOperation.TYPE:{
+                        case EdgeAddOperation.TYPE:
+                        {
                             operation = new EdgeAddOperation(data.id, data.type, data.source, data.target, data.json, data.viewId, data.oType, jabberId);
                             remoteEdgeAddCallback(operation);
-                            if(!data.historyFlag)
-                                HistoryManager.add(operation);
-                            if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] === jabberId) {
-                                triggerSave = true;
-                            }
                             break;
                         }
-                        case RevokeSharedActivityOperation.TYPE:{
-                            if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== jabberId) {
-                                operation = new RevokeSharedActivityOperation(data.id);
-                                remoteRevokeSharedActivityOperationCallback(operation);
-                            }
+                        case RevokeSharedActivityOperation.TYPE:
+                        {
+                            operation = new RevokeSharedActivityOperation(data.id);
+                            remoteRevokeSharedActivityOperationCallback(operation);
                             break;
                         }
-                        case GuidanceStrategyOperation.TYPE:{
-                            if(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] !== jabberId) {
-                                operation = new GuidanceStrategyOperation(data.data);
-                                remoteGuidanceStrategyOperation(operation);
-                            }
+                        case GuidanceStrategyOperation.TYPE:
+                        {
+                            operation = new GuidanceStrategyOperation(data.data);
+                            remoteGuidanceStrategyOperation(operation);
                             break;
                         }
                     }
                 }
-                if(triggerSave)
-                    $('#save').click();
-            })
+            });
 
+            y.share.select.observe(function(event){
+                if(event.name !== y.db.userId){
+
+                    var userInfo = y.share.userList.get(y.share.users.get(event.name));
+                    if(event.oldValue != null) {
+                        var unselectedEntity = EntityManager.find(event.oldValue);
+                        if(unselectedEntity)
+                            unselectedEntity.unhighlight();
+                    }
+
+                    if(event.value != null) {
+                        var selectedEntity = EntityManager.find(event.value);
+                        if(selectedEntity)
+                            selectedEntity.highlight(Util.getColor(userInfo.globalId), userInfo[CONFIG.NS.PERSON.TITLE]);
+                    }
+
+
+                }
+            });
         }
         if(_iwcw){
             that.registerCallbacks();

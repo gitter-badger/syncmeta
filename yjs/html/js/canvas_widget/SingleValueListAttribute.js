@@ -158,28 +158,6 @@ define([
         };
 
         /**
-         * Callback for an undone resp. redone Attribute Add Operation
-         * @param {operations.ot.AttributeAddOperation} operation
-         */
-        var historyAttributeAddCallback = function(operation){
-            if(operation instanceof AttributeAddOperation && operation.getRootSubjectEntityId() === that.getRootSubjectEntity().getEntityId() && operation.getSubjectEntityId() === that.getEntityId()){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                processAttributeAddOperation(operation);
-            }
-        };
-
-        /**
-         * Callback for an undone resp. redone Attribute Delete Operation
-         * @param {operations.ot.AttributeDeleteOperation} operation
-         */
-        var historyAttributeDeleteCallback = function(operation){
-            if(operation instanceof AttributeDeleteOperation && operation.getRootSubjectEntityId() === that.getRootSubjectEntity().getEntityId() && operation.getSubjectEntityId() === that.getEntityId()){
-                _iwcw.sendLocalOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE,operation.getOTOperation());
-                processAttributeDeleteOperation(operation);
-            }
-        };
-
-        /**
          * Add attribute to attribute list
          * @param {canvas_widget.AbstractAttribute} attribute
          */
@@ -268,24 +246,16 @@ define([
          * Register inter widget communication callbacks
          */
         this.registerCallbacks = function(){
-            //_iwcw.registerOnRemoteDataReceivedCallback(remoteAttributeAddCallback);
-            //_iwcw.registerOnRemoteDataReceivedCallback(remoteAttributeDeleteCallback);
             _iwcw.registerOnDataReceivedCallback(localAttributeAddCallback);
             _iwcw.registerOnDataReceivedCallback(localAttributeDeleteCallback);
-            //_iwcw.registerOnHistoryChangedCallback(historyAttributeAddCallback);
-            //_iwcw.registerOnHistoryChangedCallback(historyAttributeDeleteCallback);
         };
 
         /**
          * Unregister inter widget communication callbacks
          */
         this.unregisterCallbacks = function(){
-            //_iwcw.unregisterOnRemoteDataReceivedCallback(remoteAttributeAddCallback);
-            //_iwcw.unregisterOnRemoteDataReceivedCallback(remoteAttributeDeleteCallback);
             _iwcw.unregisterOnDataReceivedCallback(localAttributeAddCallback);
             _iwcw.unregisterOnDataReceivedCallback(localAttributeDeleteCallback);
-            //_iwcw.unregisterOnHistoryChangedCallback(historyAttributeAddCallback);
-            //_iwcw.unregisterOnHistoryChangedCallback(historyAttributeDeleteCallback);
         };
 
         _$node.find(".name").text(this.getName());
@@ -301,40 +271,41 @@ define([
         }
         this.registerYMap = function(disableYText){
             var ymap = that.getRootSubjectEntity().getYMap();
-            if(!disableYText) {
-                function registerAttribute(attr, ymap) {
+
+            function registerAttribute(attr, ymap) {
+                if(!disableYText) {
                     ymap.get(attr.getValue().getEntityId()).then(function (ytext) {
                         attr.registerYType(ytext);
                     });
                 }
+                else
+                    attr.registerYType(null);
+            }
 
-                var attrs = that.getAttributes();
-                for (var key in attrs) {
-                    if (attrs.hasOwnProperty(key)) {
-                        var attr = attrs[key];
-                        registerAttribute(attr, ymap);
-                    }
+            var attrs = that.getAttributes();
+            for (var key in attrs) {
+                if (attrs.hasOwnProperty(key)) {
+                    var attr = attrs[key];
+                    registerAttribute(attr, ymap);
                 }
             }
 
-            ymap.observe(function(events){
-                for (var i in events) {
-                    var operation;
-                    var data = ymap.get(events[i].name);
-                    switch (events[i].name) {
-                        case AttributeAddOperation.TYPE:
-                        {
-                            operation = new AttributeAddOperation(data.entityId, data.subjectEntityId, data.rootSubjectEntityId,data.type);
-                            remoteAttributeAddCallback(operation);
-                            break;
-                        }
-                        case AttributeDeleteOperation.TYPE:{
-                            operation = new AttributeDeleteOperation(data.entityId, data.subjectEntityId, data.rootSubjectEntityId,data.type);
-                            remoteAttributeDeleteCallback(operation);
-                            break;
-                        }
+            ymap.observe(function(event){
+                var operation;
+                var data = event.value;
+                switch (event.name) {
+                    case AttributeAddOperation.TYPE:{
+                        operation = new AttributeAddOperation(data.entityId, data.subjectEntityId, data.rootSubjectEntityId,data.type);
+                        remoteAttributeAddCallback(operation);
+                        break;
+                    }
+                    case AttributeDeleteOperation.TYPE:{
+                        operation = new AttributeDeleteOperation(data.entityId, data.subjectEntityId, data.rootSubjectEntityId,data.type);
+                        remoteAttributeDeleteCallback(operation);
+                        break;
                     }
                 }
+
             });
         }
     }

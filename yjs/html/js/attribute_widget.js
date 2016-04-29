@@ -18,7 +18,9 @@ requirejs([
     'promise!Guidancemodel'
 ],function ($,IWCW,yjsSync,AttributeWrapper,EntityManager, ViewGenerator, JoinOperation,InitModelTypesOperation,ViewInitOperation, SetModelAttributeNodeOperation, model,guidancemodel) {
 
-    yjsSync().done(function(){
+    var iwc = IWCW.getInstance(CONFIG.WIDGET.NAME.ATTRIBUTE);
+
+    yjsSync(iwc.getSpaceTitle()).done(function(){
         InitAttributeWidget();
     }).fail(function(){
         window.y= undefined;
@@ -26,7 +28,7 @@ requirejs([
     });
     function InitAttributeWidget() {
 
-        var iwc = IWCW.getInstance(CONFIG.WIDGET.NAME.ATTRIBUTE);
+
 
         var wrapper = new AttributeWrapper($("#wrapper"));
 
@@ -47,14 +49,24 @@ requirejs([
             for (nodeId in json.nodes) {
                 if (json.nodes.hasOwnProperty(nodeId)) {
                     var node = EntityManager.createNodeFromJSON(json.nodes[nodeId].type, nodeId, json.nodes[nodeId].left, json.nodes[nodeId].top, json.nodes[nodeId].width, json.nodes[nodeId].height, json.nodes[nodeId]);
-                    node.registerYType();
+                    try{
+                        node.registerYType();
+                    }catch(e){
+                        //If this fails doesn't matter initialize it with bindYTextCallback
+                    }
                     node.addToWrapper(wrapper);
                 }
             }
             for (edgeId in json.edges) {
                 if (json.edges.hasOwnProperty(edgeId)) {
                     var edge = EntityManager.createEdgeFromJSON(json.edges[edgeId].type, edgeId, json.edges[edgeId].source, json.edges[edgeId].target, json.edges[edgeId]);
-                    edge.registerYType();
+                    try{
+                        edge.registerYType();
+
+                    }catch(e){
+                        //If this fails doesn't matter initialize it with bindYTextCallback
+
+                    }
                     edge.addToWrapper(wrapper);
                 }
             }

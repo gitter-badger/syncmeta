@@ -57,62 +57,84 @@ requirejs([
     var _iwcw;
     _iwcw = IWCW.getInstance(CONFIG.WIDGET.NAME.MAIN);
 
-    yjsSync().done(function(){
-        console.log('yjs log: Yjs Initialized successfully!');
+    yjsSync(_iwcw.getSpaceTitle()).done(function(){
+        console.info('yjs log: Yjs Initialized successfully!');
         y.share.users.set(y.db.userId,_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
+        var userInfo = _iwcw.getUser();
+        if(userInfo.globalId === -1)
+            userInfo.globalId = y.share.userList.keysPrimitives().length;
+        y.share.userList.set(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID], userInfo);
         InitMainWidget();
 
 
-    }).fail(function(error){
-        console.log("yjs log: Yjs intialization failed!");
+    }).fail(function(){
+        console.info("yjs log: Yjs intialization failed!");
         window.y = undefined;
         InitMainWidget();
     });
     function InitMainWidget() {
 
         var canvas = new Canvas($("#canvas"));
-        y.share.join.observe(function(events){
-            for(var i in events) {
-                var event = events[i];
-                var activityOperation;
-                var done = y.share.join.get(event.name);
-                if(!done && event.name !== _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]){
-                    y.share.join.set(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID], true);
-                }else if(event.name === _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] && !done){
-                    if (metamodel.constructor === Object) {
-                        var op = new InitModelTypesOperation(metamodel);
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, op.toNonOTOperation());
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, op.toNonOTOperation());
-                    }
-                    //TODO
-                    //_iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.toNonOTOperation());
-
-                    JSONtoGraph(model).done(function(stats){
-                        console.info(stats);
-                        $("#loading").hide();
-                        canvas.resetTool();
-                        if(CONFIG.TEST_MODE)
-                            require(['./../test/CanvasWidgetTest'], function(CanvasWidgetTest){
-                                CanvasWidgetTest(canvas);
-                            });
-                    });
-
-                    if (canvas.getModelAttributesNode() === null) {
-                        var modelAttributesNode = EntityManager.createModelAttributesNode();
-                        canvas.setModelAttributesNode(modelAttributesNode);
-                        modelAttributesNode.addToCanvas(canvas);
-                    }
-                    canvas.resetTool();
+        y.share.join.observe(function(event){
+            var activityOperation;
+            var done = y.share.join.get(event.name);
+            if(!done && event.name !== _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]){
+                y.share.join.set(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID], true);
+            }else if(event.name === _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] && !done){
+                if (metamodel.constructor === Object) {
+                    var op = new InitModelTypesOperation(metamodel);
+                    _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, op.toNonOTOperation());
+                    _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, op.toNonOTOperation());
                 }
-                activityOperation = new ActivityOperation(
-                    "UserJoinActivity",
-                    "-1",
-                    event.name,
-                    "",
-                    {}
-                ).toNonOTOperation();
-                _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);
+                //TODO
+                //_iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.toNonOTOperation());
+
+                JSONtoGraph(model).done(function(stats){
+                    console.info(stats);
+                    $("#loading").hide();
+                    canvas.resetTool();
+                    if(CONFIG.TEST_MODE)
+                        require(['./../test/CanvasWidgetTest'], function(CanvasWidgetTest){
+                            CanvasWidgetTest(canvas);
+                        });
+                });
+
+                _iwcw.registerOnDataReceivedCallback(function (operation) {
+                    if (operation instanceof SetModelAttributeNodeOperation) {
+                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, new SetModelAttributeNodeOperation().toNonOTOperation());
+                    }
+                    else if (operation instanceof UpdateViewListOperation) {
+                        y.share.views.set(UpdateViewListOperation.TYPE, new UpdateViewListOperation().toJSON());
+                    }
+                });
+                y.share.views.observe(function(event){
+                    switch (event.name){
+                        case UpdateViewListOperation.TYPE:{
+                            if (metamodel.constructor === Object) {
+                                ViewManager.GetViewpointList();
+                            } else {
+                                ViewManager.initViewList();
+                            }
+                        }
+                    }
+                });
+
+
+                if (canvas.getModelAttributesNode() === null) {
+                    var modelAttributesNode = EntityManager.createModelAttributesNode();
+                    canvas.setModelAttributesNode(modelAttributesNode);
+                    modelAttributesNode.addToCanvas(canvas);
+                }
+                canvas.resetTool();
             }
+            activityOperation = new ActivityOperation(
+                "UserJoinActivity",
+                "-1",
+                event.name,
+                "",
+                {}
+            ).toNonOTOperation();
+            _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);
         });
 
         if (guidancemodel.isGuidanceEditor()) {
@@ -244,6 +266,17 @@ requirejs([
                     $lblCurrentViewId.text("");
                     // $loading.hide();
                 }
+            });
+
+            var $saveImage = $("#save_image");
+            $saveImage.show();
+            $saveImage.click(function(){
+                canvas.toPNG().then(function(uri){
+                    var link = document.createElement('a');
+                    link.download = "export.png";
+                    link.href = uri;
+                    link.click();
+                });
             });
 
         }
@@ -416,33 +449,8 @@ requirejs([
 
             var activityOperation = new ActivityOperation("ViewApplyActivity", json.id, _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
             _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation.toNonOTOperation());
-            //TODO
-            //_iwcw.sendRemoteNonOTOperation(activityOperation.toNonOTOperation());
 
-            var nodeId, edgeId;
-            for (nodeId in json.nodes) {
-                if (json.nodes.hasOwnProperty(nodeId)) {
-                    var jNode = json.nodes[nodeId];
-                    var node = EntityManager.createNodeFromJSON(jNode.type, nodeId, jNode.left, jNode.top, jNode.width, jNode.height, jNode.zIndex, jNode, jNode.viewId);
-                    //TODO add origin to nodes
-                    //if(jNode.hasOwnProperty('origin'))
-                    //    node.setOrigin(jNode.origin);
-                    node.addToCanvas(canvas);
-                    node.draw();
-                }
-            }
-            for (edgeId in json.edges) {
-                if (json.edges.hasOwnProperty(edgeId)) {
-                    var jEdge = json.edges[edgeId];
-                    var edge = EntityManager.createEdgeFromJSON(jEdge.type, edgeId, jEdge.source, jEdge.target, jEdge);
-                    //  TODO add origin to edges
-                    //if(jEdge.hasOwnProperty('origin'))
-                    //    edge.setOrigin(jEdge.origin);
-                    edge.addToCanvas(canvas);
-                    edge.connect();
-                }
-            }
-
+            JSONtoGraph(json);
         }
 
         function DeleteView(viewId) {
@@ -558,23 +566,13 @@ requirejs([
                         //promises.push(createYTextAttribute(map,node.getAttribute(nodeId+'[customShape]')));
                         createYTextAttribute(map,node.getAttribute(nodeId+'[customShape]'));
                     }
-                    else if(jsonNode.type === 'Object' || jsonNode.type === 'Relationship' || jsonNode.type === 'Abstract Class'){
+                    else if(jsonNode.type === 'Object' || jsonNode.type === 'Relationship' || jsonNode.type === 'Abstract Class' || jsonNode.type ==='Enumeration'){
                         attrs = node.getAttribute('[attributes]').getAttributes();
                         for(var attrKey in attrs){
                             if(attrs.hasOwnProperty(attrKey)) {
                                 attr = attrs[attrKey];
                                 //promises.push(createYTextAttribute(map, attr.getKey()));
                                 createYTextAttribute(map, attr.getKey());
-                            }
-                        }
-                    }
-                    else if(jsonNode.type==='Enumeration'){
-                        attrs = node.getAttribute('[attributes]').getAttributes();
-                        for(var attrKey2 in attrs){
-                            if(attrs.hasOwnProperty(attrKey2)) {
-                                attr = attrs[attrKey2];
-                                //promises.push(createYTextAttribute(map, attr.getValue()));
-                                createYTextAttribute(map, attr.getValue());
                             }
                         }
                     }
@@ -900,102 +898,9 @@ requirejs([
 
         ViewManager.initViewList();
 
-        //TODO
-        /*
-         _iwcw.registerOnJoinOrLeaveCallback(function (operation) {
-         var activityOperation;
-         if (operation instanceof JoinOperation) {
-         if (operation.getUser() === _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] && operation.getSender() === _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]) {
-         if (operation.isDone()) {
-         operation.setData(model);
-         if (metamodel.constructor === Object) {
-         var op = new InitModelTypesOperation(metamodel);
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, op.toNonOTOperation());
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, op.toNonOTOperation());
-         }
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.toNonOTOperation());
-
-         JSONtoGraph(model);
-         if (canvas.getModelAttributesNode() === null) {
-         var modelAttributesNode = EntityManager.createModelAttributesNode();
-         canvas.setModelAttributesNode(modelAttributesNode);
-         modelAttributesNode.addToCanvas(canvas);
-         }
-         canvas.resetTool();
-         //$("#loading").hide();
-
-         _iwcw.registerOnLocalDataReceivedCallback(function (operation) {
-         if (operation instanceof SetModelAttributeNodeOperation) {
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, new SetModelAttributeNodeOperation().toNonOTOperation());
-         }
-         else if (operation instanceof UpdateViewListOperation) {
-         _iwcw.sendRemoteNonOTOperation(new UpdateViewListOperation().toNonOTOperation());
-         if (metamodel.constructor === Object) {
-         ViewManager.GetViewpointList();
-         } else {
-         ViewManager.initViewList();
-         }
-         }
-         });
-
-         _iwcw.registerOnRemoteDataReceivedCallback(function (operation) {
-         if (operation instanceof UpdateViewListOperation) {
-         ViewManager.initViewList();
-         } else if (operation instanceof ActivityOperation) {
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, operation.toNonOTOperation());
-         }
-         });
-
-
-         activityOperation = new ActivityOperation(
-         "UserJoinActivity",
-         "-1",
-         operation.getUser(),
-         "",
-         {}
-         ).toNonOTOperation();
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);
-         } else {
-         activityOperation = new ActivityOperation(
-         "UserJoinActivity",
-         "-1",
-         operation.getSender(),
-         "",
-         {}
-         ).toNonOTOperation();
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);
-         model = operation.getData();
-         }
-         } else {
-         //if(operation.isDone()){
-         activityOperation = new ActivityOperation(
-         "UserJoinActivity",
-         "-1",
-         operation.getSender(),
-         "",
-         {}
-         ).toNonOTOperation();
-         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);
-         //} else {
-         //}
-         }
-         }
-         });
-         */
-
-        //local user
+        //local user joins
         y.share.join.set(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID],false);
 
-
-        /*
-         $("#save_image").click(function(){
-         canvas.toPNG().then(function(uri){
-         var link = document.createElement('a');
-         link.download = "export.png";
-         link.href = uri;
-         link.click();
-         });
-         });*/
     }
 
 });
