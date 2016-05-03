@@ -49,15 +49,17 @@ requirejs([
     'canvas_widget/ViewManager',
     'canvas_widget/ViewGenerator',
     'canvas_widget/HistoryManager',
+    'promise!Space',
     'promise!Metamodel',
     'promise!Model',
     'promise!Guidancemodel'
-],function($,jsPlumb,IWCW, yjsSync,Util,ToolSelectOperation,ActivityOperation,JoinOperation, ViewInitOperation, UpdateViewListOperation, DeleteViewOperation,SetViewTypesOperation, InitModelTypesOperation, SetModelAttributeNodeOperation, Canvas,EntityManager,NodeTool,ObjectNodeTool,AbstractClassNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,EdgeTool,GeneralisationEdgeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,ObjectNode,AbstractClassNode,RelationshipNode,RelationshipGroupNode,EnumNode,NodeShapeNode,EdgeShapeNode,GeneralisationEdge,BiDirAssociationEdge,UniDirAssociationEdge, ViewObjectNode, ViewObjectNodeTool,ViewRelationshipNode, ViewRelationshipNodeTool, ViewManager, ViewGenerator, HistoryManager,metamodel,model,guidancemodel) {
+],function($,jsPlumb,IWCW, yjsSync,Util,ToolSelectOperation,ActivityOperation,JoinOperation, ViewInitOperation, UpdateViewListOperation, DeleteViewOperation,SetViewTypesOperation, InitModelTypesOperation, SetModelAttributeNodeOperation, Canvas,EntityManager,NodeTool,ObjectNodeTool,AbstractClassNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,EdgeTool,GeneralisationEdgeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,ObjectNode,AbstractClassNode,RelationshipNode,RelationshipGroupNode,EnumNode,NodeShapeNode,EdgeShapeNode,GeneralisationEdge,BiDirAssociationEdge,UniDirAssociationEdge, ViewObjectNode, ViewObjectNodeTool,ViewRelationshipNode, ViewRelationshipNodeTool, ViewManager, ViewGenerator, HistoryManager,space,metamodel,model,guidancemodel) {
 
     var _iwcw;
     _iwcw = IWCW.getInstance(CONFIG.WIDGET.NAME.MAIN);
+    _iwcw.setSpace(space);
 
-    yjsSync(_iwcw.getSpaceTitle()).done(function(){
+    yjsSync().done(function(){
         console.info('yjs log: Yjs Initialized successfully!');
         y.share.users.set(y.db.userId,_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
         var userInfo = _iwcw.getUser();
@@ -566,13 +568,23 @@ requirejs([
                         //promises.push(createYTextAttribute(map,node.getAttribute(nodeId+'[customShape]')));
                         createYTextAttribute(map,node.getAttribute(nodeId+'[customShape]'));
                     }
-                    else if(jsonNode.type === 'Object' || jsonNode.type === 'Relationship' || jsonNode.type === 'Abstract Class' || jsonNode.type ==='Enumeration'){
+                    else if(jsonNode.type === 'Object' || jsonNode.type === 'Relationship' || jsonNode.type === 'Abstract Class'){
                         attrs = node.getAttribute('[attributes]').getAttributes();
                         for(var attrKey in attrs){
                             if(attrs.hasOwnProperty(attrKey)) {
                                 attr = attrs[attrKey];
                                 //promises.push(createYTextAttribute(map, attr.getKey()));
                                 createYTextAttribute(map, attr.getKey());
+                            }
+                        }
+                    }
+                    else if(jsonNode.type==='Enumeration'){
+                        attrs = node.getAttribute('[attributes]').getAttributes();
+                        for(var attrKey2 in attrs){
+                            if(attrs.hasOwnProperty(attrKey2)) {
+                                attr = attrs[attrKey2];
+                                //promises.push(createYTextAttribute(map, attr.getValue()));
+                                createYTextAttribute(map, attr.getValue());
                             }
                         }
                     }
