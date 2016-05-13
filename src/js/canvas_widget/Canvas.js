@@ -50,6 +50,13 @@ function ($, jsPlumb, IWCW, Util, NodeAddOperation, EdgeAddOperation, ToolSelect
 
         AbstractCanvas.call(this, $node);
 
+        jsPlumb.addGroup({
+            el:$node[0],
+            id:'canvas',
+            draggable:false,
+            constraint:true
+        });
+
         /**
          * jQuery object of DOM node representing the canvas
          * @type {jQuery}

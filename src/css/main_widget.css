@@ -390,3 +390,6 @@ button[disabled=disabled], button:disabled {
 .ghost-edge-overlay {
     z-index: 31000;
 }
+.jsplumb-drag-hover {
+    outline:4px solid cornflowerblue;
+}

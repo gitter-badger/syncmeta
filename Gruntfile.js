@@ -28,12 +28,12 @@ module.exports = function(grunt) {
             lib: {
                 files: [
                     {src: '<%= bowerdir %>/iwc/index.js', dest: '<%= distdir %>/js/lib/vendor/iwc.js'},
-                    {src: '<%= bowerdir %>/jquery/dist/jquery.js', dest: '<%= distdir %>/js/lib/vendor/jquery.js'},
+                    {src: '<%= bowerdir %>/jquery/jquery.js', dest: '<%= distdir %>/js/lib/vendor/jquery.js'},
                     {src: '<%= bowerdir %>/jquery-migrate/jquery-migrate.js', dest: '<%= distdir %>/js/lib/vendor/jquery-migrate.js'},
                     {src: '<%= bowerdir %>/jquery-ui/ui/jquery-ui.js', dest: '<%= distdir %>/js/lib/vendor/jquery-ui.js'},
                     {src: '<%= bowerdir %>/jquery-ui/themes/base/jquery-ui.css', dest: '<%= distdir %>/css/vendor/jquery-ui.css'},
                     {cwd: '<%= bowerdir %>/jquery-ui/themes/base', expand: true, src: ['images/*'], dest: '<%= distdir %>/css/vendor/'},
-                    {src: '<%= bowerdir %>/jsPlumb/dist/js/jquery.jsPlumb-1.5.*.js', dest: '<%= distdir %>/js/lib/vendor/jquery.jsPlumb.js'},
+                    {src: '<%= bowerdir %>/jsPlumb/dist/js/jsPlumb-2.1.1.js', dest: '<%= distdir %>/js/lib/vendor/jquery.jsPlumb.js'},
                     {src: '<%= bowerdir %>/jQuery-contextMenu/src/jquery.contextMenu.js', dest: '<%= distdir %>/js/lib/vendor/jquery.contextMenu.js'},
                     {src: '<%= bowerdir %>/jQuery-contextMenu/src/jquery.contextMenu.css', dest: '<%= distdir %>/css/vendor/jquery.contextMenu.css'},
                     {src: '<%= bowerdir %>/jquery-mousewheel/jquery.mousewheel.js', dest: '<%= distdir %>/js/lib/vendor/jquery.mousewheel.js'},

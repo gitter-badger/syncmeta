@@ -104,6 +104,21 @@ define([
             });
         }, 3000);
 
+        if(type === 'Actor With Boundary') {
+            _$node.addClass('group-container');
+            jsPlumb.addGroup({
+                el: _$node[0],
+                id:id
+            });
+            jsPlumb.bind("group:addMember", function(p) {
+                console.info(p);
+            });
+            jsPlumb.bind("group:removeMember", function(p) {
+                console.info(p);
+            });
+        }
+
+
         /**
          * Inter widget communication wrapper
          * @type {Object}
@@ -511,11 +526,18 @@ define([
         var repaint = function(){
             //var edgeId,
             //    edges = that.getEdges();
-            jsPlumb.repaint(_$node);
+
+            //jsPlumb.repaint(_$node);
+            //jsPlumb.repaint(_$node[0]);
+            //jsPlumb.repaint('.'+that.getEntityId());
+            //jsPlumb.repaintEverything();
+
             /*for(edgeId in edges){
              if(edges.hasOwnProperty(edgeId)){
-             edges[edgeId].repaintOverlays();
-             edges[edgeId].setZIndex();
+             var edge = edges[edgeId];
+             jsPlumb.repaint(edge.getEntityId());
+             //edge.repaintOverlays();
+             edge.setZIndex();
              }
              }*/
             _.each(require('canvas_widget/EntityManager').getEdges(),function(e){e.setZIndex();});
@@ -733,6 +755,7 @@ define([
                 height: _appearance.height,
                 zIndex: _zIndex
             });
+
         };
 
         /**
@@ -1028,8 +1051,8 @@ define([
             var drag = false;
             var $sizePreview = $("<div class=\"size-preview\"></div>").hide();
             _$node.on("click",function(){
-                _canvas.select(that);
-            })
+                    _canvas.select(that);
+                })
                 //Enable Node Resizing
                 .resizable({
                     containment: "parent",
@@ -1076,59 +1099,8 @@ define([
                         _canvas.showGuidanceBox();
                     }
                 })
-
-                //Enable Node Dragging
-                .draggable({
-                    containment: "parent",
-                    start: function(ev,ui){
-                        originalPos.top = ui.position.top;
-                        originalPos.left = ui.position.left;
-                        //ui.position.top = 0;
-                        //ui.position.left = 0;
-                        _canvas.select(that);
-                        _canvas.hideGuidanceBox();
-                        _$node.css({opacity:0.5});
-                        _$node.resizable("disable");
-                        drag = false;
-                        _$node.draggable("option","grid",ev.ctrlKey ? [20,20] : '');
-                    },
-                    drag: function(ev){
-                        // ui.position.left = Math.round(ui.position.left  / _canvas.getZoom());
-                        // ui.position.top = Math.round(ui.position.top / _canvas.getZoom());
-
-                        if(drag) repaint();
-                        drag = true;
-                        _canvas.hideGuidanceBox();
-                        _$node.draggable("option","grid",ev.ctrlKey ? [20,20] : '');
-                    },
-                    stop: function(ev,ui){
-                        _$node.css({opacity:''});
-                        _$node.resizable("enable");
-                        var id = _$node.attr("id");
-                        //_$node.css({top: originalPos.top / _canvas.getZoom(), left: originalPos.left / _canvas.getZoom()});
-                        var offsetX = Math.round((ui.position.left - originalPos.left) / _canvas.getZoom());
-                        var offsetY = Math.round((ui.position.top - originalPos.top) / _canvas.getZoom());
-                        var operation = new NodeMoveOperation(id,offsetX,offsetY,_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
-                        if(_ymap){
-                            _ymap.set('top', _appearance.top + offsetY);
-                            _ymap.set('left',_appearance.left+offsetX);
-                            propagateNodeMoveOperation(operation);
-                            _ymap.set(NodeMoveOperation.TYPE,operation.toJSON());
-                        }
-                        else {
-                            propagateNodeMoveOperation(operation);
-                        }
-                        //that.canvas.callListeners(CONFIG.CANVAS.LISTENERS.NODEMOVE,id,offsetX,offsetY);
-                        //Avoid node selection on drag stop
-                        _$node.draggable("option","grid",'');
-                        _canvas.showGuidanceBox();
-                        $(ev.toElement).one('click',function(ev){ev.stopImmediatePropagation();});
-                    }
-                })
-
                 //Enable Node Rightclick menu
                 .contextMenu(true)
-
                 .transformable({
                     rotatable: false,
                     skewable: false,
@@ -1136,6 +1108,67 @@ define([
                 })
 
                 .find("input").prop("disabled",false).css('pointerEvents','');
+
+            //Enable Node Dragging
+            jsPlumb.draggable(id,{
+                containment: "parent",
+                start: function(ev,ui){
+                    //originalPos.top = ui.position.top;
+                    //originalPos.left = ui.position.left;
+                    originalPos.top = $(ev.el).position().top;
+                    originalPos.left =$(ev.el).position().left;
+
+                    _canvas.select(that);
+                    _canvas.hideGuidanceBox();
+                    _$node.css({opacity:0.5});
+                    _$node.resizable("disable");
+                    drag = false;
+                    //_$node.draggable("option","grid",ev.ctrlKey ? [20,20] : '');
+                },
+                drag: function(ev){
+                    // ui.position.left = Math.round(ui.position.left  / _canvas.getZoom());
+                    // ui.position.top = Math.round(ui.position.top / _canvas.getZoom());
+
+                    ///if(drag) repaint();
+                    drag = true;
+                    _canvas.hideGuidanceBox();
+                    //_$node.draggable("option","grid",ev.ctrlKey ? [20,20] : '');
+                },
+                stop: function(ev,ui){
+                    _$node.css({opacity:''});
+                    _$node.resizable("enable");
+                    var id = _$node.attr("id");
+                    //_$node.css({top: originalPos.top / _canvas.getZoom(), left: originalPos.left / _canvas.getZoom()});
+                    //var offsetX = Math.round((ui.position.left - originalPos.left) / _canvas.getZoom());
+                    //var offsetY = Math.round((ui.position.top - originalPos.top) / _canvas.getZoom());
+                    var offsetX, offsetY;
+                    if($(ev.el).parent().is('.group-container')){
+                        offsetX = 0;
+                        offsetY=0;
+                        _appearance.left = Math.round(($(ev.el).position().left));
+                        _appearance.top = Math.round(($(ev.el).position().top));
+                    }
+                    else {
+                        offsetX = Math.round(($(ev.el).position().left - originalPos.left) / _canvas.getZoom());
+                        offsetY = Math.round(($(ev.el).position().top - originalPos.top) / _canvas.getZoom());
+                    }
+                    var operation = new NodeMoveOperation(id,offsetX,offsetY,_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
+                    if(_ymap){
+                        _ymap.set('top', _appearance.top + offsetY);
+                        _ymap.set('left',_appearance.left+offsetX);
+                        propagateNodeMoveOperation(operation);
+                        _ymap.set(NodeMoveOperation.TYPE,operation.toJSON());
+                    }
+                    else {
+                        propagateNodeMoveOperation(operation);
+                    }
+                    //Avoid node selection on drag stop
+                    _$node.draggable("option","grid",'');
+                    _canvas.showGuidanceBox();
+                    repaint();
+                    $(ev.toElement).one('click',function(ev){ev.stopImmediatePropagation();});
+                }
+            })
 
         };
 

@@ -600,7 +600,7 @@ requirejs([
                             }
                         }
                     }
-
+                    jsPlumb.addToGroup('canvas',node._get$node()[0]);
                 }
 
                 if(promises.length >0) {

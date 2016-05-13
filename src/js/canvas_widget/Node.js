@@ -105,9 +105,9 @@ define([
                         }
                         _$node.find("."+key).append(attrObj[attributeId].get$node());
                     }
+
                 }
                 that.setAttributes(attrObj);
-
             };
 
             /**

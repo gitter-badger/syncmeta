@@ -17,7 +17,6 @@
     "jquery": "~2.0.3",
     "jquery-ui": "~1.10.3",
     "jquery-migrate": "*",
-    "jsPlumb": "git://github.com/sporritt/jsPlumb.git#~1.5.3",
     "jQuery-contextMenu": "git://github.com/medialize/jQuery-contextMenu.git#1.7.0",
     "requirejs": "~2.1.8",
     "requirejs-i18n": "~2.0.4",
@@ -34,7 +33,8 @@
     "y-array": "^9.0.0",
     "y-websockets-client": "^8.0.8",
     "y-text": "^9.0.0",
-    "y-memory": "^8.0.4"
+    "y-memory": "^8.0.4",
+    "jsPlumb": "^2.1.1"
   },
   "resolutions": {
     "lodash": "~2.4.1"
