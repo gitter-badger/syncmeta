@@ -600,7 +600,9 @@ requirejs([
                             }
                         }
                     }
-                    jsPlumb.addToGroup('canvas',node._get$node()[0]);
+                    var nodeType = EntityManager.getNodeType(jsonNode.type);
+                    if(nodeType.GROUPING)
+                        containers[nodeId] = jsonNode.members;
                 }
 
                 if(promises.length >0) {
@@ -642,6 +644,7 @@ requirejs([
             var numberOfEdges = _.keys(json.edges).length;
             var createdNodes=0;
             var createdEdges=0;
+            var containers = {};
 
             function createNodes(nodes){
                 var deferred = $.Deferred();
@@ -723,6 +726,16 @@ requirejs([
             if(numberOfNodes>0) {
                 createNodes(json.nodes).then(null, null, function (createdNodes) {
                     if (createdNodes === numberOfNodes) {
+                        //Add Nodes to Groups
+                        for(var cKey in containers){
+                            if(containers.hasOwnProperty(cKey)){
+                                _.each(containers[cKey], function(nodeId){
+                                    if(node = EntityManager.findNode(nodeId))
+                                        jsPlumb.addToGroup(cKey,node.get$node()[0]);
+                                });
+                                jsPlumb.repaintEverything();
+                            }
+                        }
                         if (numberOfEdges > 0) {
                             registerEdges(json.edges).then(null, null, function (createdEdges) {
                                 if (createdEdges === numberOfEdges) {

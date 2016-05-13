@@ -8,8 +8,9 @@ define([
     'canvas_widget/IntegerAttribute',
     'canvas_widget/SingleColorValueAttribute',
     'canvas_widget/SingleMultiLineValueAttribute',
+    'canvas_widget/BooleanAttribute',
     'text!templates/canvas_widget/node_shape_node.html'
-],/** @lends NodeShapeNode */function($,jsPlumb,_,AbstractNode,SingleSelectionAttribute,SingleValueAttribute,IntegerAttribute,SingleColorValueAttribute,SingleMultiLineValueAttribute,nodeShapeNodeHtml) {
+],/** @lends NodeShapeNode */function($,jsPlumb,_,AbstractNode,SingleSelectionAttribute,SingleValueAttribute,IntegerAttribute,SingleColorValueAttribute,SingleMultiLineValueAttribute,BooleanAttribute,nodeShapeNodeHtml) {
 
     NodeShapeNode.TYPE = "Node Shape";
     NodeShapeNode.DEFAULT_WIDTH = 150;
@@ -79,13 +80,16 @@ define([
         var attrColor = new SingleColorValueAttribute(this.getEntityId()+"[color]","Color",this);
         var attrCustomShape = new SingleMultiLineValueAttribute(this.getEntityId()+"[customShape]","Custom Shape",this);
         var attrAnchors = new SingleValueAttribute(this.getEntityId()+"[customAnchors]","Custom Anchors",this);
+        var attrIsGroupContainer = new BooleanAttribute(this.getEntityId()+"[grouping]","Enable Grouping", this);
 
         this.addAttribute(attrShapeSelect);
         this.addAttribute(attrColor);
+        this.addAttribute(attrIsGroupContainer);
         this.addAttribute(attrWidth);
         this.addAttribute(attrHeight);
         this.addAttribute(attrCustomShape);
         this.addAttribute(attrAnchors);
+
 
         _$node.find(".label").append(this.getLabel().get$node());
 
@@ -96,13 +100,13 @@ define([
         }
 
 
-
         this.registerYMap = function(map,disableYText){
             AbstractNode.prototype.registerYMap.call(this,map);
 
             attrShapeSelect.getValue().registerYType();
             attrWidth.getValue().registerYType();
             attrHeight.getValue().registerYType();
+            attrIsGroupContainer.getValue().registerYType();
             if(!disableYText)
                 registerYTextAttributes(map);
 

@@ -285,6 +285,7 @@ define(['Util',
                                         shape = {
                                             shape : neighbor.getAttribute(neighbor.getEntityId() + "[shape]").getValue().getValue(),
                                             color : neighbor.getAttribute(neighbor.getEntityId() + "[color]").getValue().getValue(),
+                                            grouping: neighbor.getAttribute(neighbor.getEntityId()+"[grouping]").getValue().getValue(),
                                             defaultWidth : parseInt(neighbor.getAttribute(neighbor.getEntityId() + "[defaultWidth]").getValue().getValue()),
                                             defaultHeight : parseInt(neighbor.getAttribute(neighbor.getEntityId() + "[defaultHeight]").getValue().getValue()),
                                             customShape : neighbor.getAttribute(neighbor.getEntityId() + "[customShape]").getValue().getValue(),

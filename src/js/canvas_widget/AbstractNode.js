@@ -105,12 +105,17 @@ define([
         }, 3000);
 
         if(type === 'Actor With Boundary') {
+            var _members= [];
             _$node.addClass('group-container');
             jsPlumb.addGroup({
                 el: _$node[0],
-                id:id
+                id:id,
+                revert:false
             });
             jsPlumb.bind("group:addMember", function(p) {
+                if(p.group.id===that.getEntityId())
+                    _members.push($(p.el).attr('id'));
+
                 console.info(p);
             });
             jsPlumb.bind("group:removeMember", function(p) {
@@ -1019,6 +1024,7 @@ define([
             _.forEach(this.getAttributes(),function(val,key){
                 attr[key] = val.toJSON();
             });
+
             //noinspection JSAccessibilityCheck
             return {
                 label: _label.toJSON(),
@@ -1028,7 +1034,8 @@ define([
                 height: _appearance.height,
                 zIndex: _zIndex,
                 type: _type,
-                attributes: attr
+                attributes: attr,
+                members : _members
             };
         };
 
@@ -1051,8 +1058,8 @@ define([
             var drag = false;
             var $sizePreview = $("<div class=\"size-preview\"></div>").hide();
             _$node.on("click",function(){
-                    _canvas.select(that);
-                })
+                _canvas.select(that);
+            })
                 //Enable Node Resizing
                 .resizable({
                     containment: "parent",
@@ -1106,9 +1113,9 @@ define([
                     skewable: false,
                     scalable: false
                 })
-
                 .find("input").prop("disabled",false).css('pointerEvents','');
 
+            var inGroup = false;
             //Enable Node Dragging
             jsPlumb.draggable(id,{
                 containment: "parent",
@@ -1117,6 +1124,8 @@ define([
                     //originalPos.left = ui.position.left;
                     originalPos.top = $(ev.el).position().top;
                     originalPos.left =$(ev.el).position().left;
+
+                    inGroup = $(ev.el).parent().is('.group-container');
 
                     _canvas.select(that);
                     _canvas.hideGuidanceBox();
@@ -1142,11 +1151,11 @@ define([
                     //var offsetX = Math.round((ui.position.left - originalPos.left) / _canvas.getZoom());
                     //var offsetY = Math.round((ui.position.top - originalPos.top) / _canvas.getZoom());
                     var offsetX, offsetY;
-                    if($(ev.el).parent().is('.group-container')){
-                        offsetX = 0;
-                        offsetY=0;
-                        _appearance.left = Math.round(($(ev.el).position().left));
-                        _appearance.top = Math.round(($(ev.el).position().top));
+                    if(($(ev.el).parent().is('.group-container') && !inGroup) || (!$(ev.el).parent().is('.group-container') && inGroup)){
+                        offsetY= Math.round(ev.pos[1]);
+                        offsetX = Math.round(ev.pos[0]);
+                        _appearance.left = 0;
+                        _appearance.top = 0;
                     }
                     else {
                         offsetX = Math.round(($(ev.el).position().left - originalPos.left) / _canvas.getZoom());
