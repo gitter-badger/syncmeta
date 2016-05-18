@@ -2,12 +2,12 @@
 <!-- generated on Wed May 18 2016 17:14:04 -->
 <Module>
   <ModulePrefs
-    title="User Activity"
+    title="Test Widget"
     description=""
     author="Stephan Erdtmann"
     author_email="erdtmann@dbis.rwth-aachen.de"
-    width="120"
-    height="400">
+    width="400"
+    height="500">
 
     <Require feature="opensocial-0.8" ></Require>
     <Require feature="openapp" ></Require>
@@ -60,22 +60,21 @@
     </script>
     <script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/config.js"></script>
     <script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/require.js"></script>    
-    <link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/yjs/html/css/vendor/jquery-ui.css">
-<link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/yjs/html/css/style.css">
-<link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/yjs/html/css/activity_widget.css">
-<script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/activity_widget.js"></script>
-<script>
+    <link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/test/mocha.css">
+<script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/jquery.js"></script>
+<script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/test/mocha.js"></script>
+<script src="http://rwth-acis.github.io/syncmeta/yjs/html/test/test_widget.js"></script>
 
-</script>
-<h2>Users online</h2>
-<div class="list_wrapper">
-    <div id="user_list" class="list"></div>
-</div>
-<h2>Activities</h2>
-<div class="list_wrapper">
-    <div id="activity_list" class="list"></div>
-</div>
-<div id="q"></div>
+<style>
+    #mocha {
+        max-height: 500px;
+        overflow: auto;
+    }
+</style>
+
+<div id="mocha"></div>
+<div id="messages"></div>
+<div id="fixtures"></div>
     <script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/shared.js"></script>    
     ]]>
   </Content>
