@@ -8,7 +8,6 @@ requirejs([
     'lib/yjs-sync',
     'palette_widget/Palette',
     'palette_widget/MoveTool',
-    'palette_widget/Separator',
     'palette_widget/ObjectNodeTool',
     'palette_widget/AbstractClassNodeTool',
     'palette_widget/EnumNodeTool',
@@ -28,15 +27,16 @@ requirejs([
     //'text!templates/canvas_widget/triangle_node.html'
     //'promise!Metamodel',
     //'promise!Guidancemodel'
-],function ($,yjsSync,Palette,MoveTool,Separator,ObjectNodeTool,AbstractClassNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,GeneralisationEdgeTool,ViewObjectNodeTool,ViewRelationshipNodeTool/*,circleNodeHtml,diamondNodeHtml,rectangleNodeHtml,roundedRectangleNodeHtml,triangleNodeHtml*//*,metamodel,guidancemodel*/) {
+],function ($,yjsSync,Palette,MoveTool,ObjectNodeTool,AbstractClassNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,GeneralisationEdgeTool,ViewObjectNodeTool,ViewRelationshipNodeTool/*,circleNodeHtml,diamondNodeHtml,rectangleNodeHtml,roundedRectangleNodeHtml,triangleNodeHtml*//*,metamodel,guidancemodel*/) {
 
-    yjsSync().done(function() {
+    yjsSync().done(function(y) {
+        window.y = y;
         console.info('PALETTE:Yjs successfully initialized');
         var metamodel = y.share.data.get('metamodel');
         var palette = new Palette($("#palette"), $("#info"));
 
         palette.addTool(new MoveTool());
-        palette.addSeparator(new Separator());
+        palette.addSeparator();
 
         //Set the metamodel to the guidance metamodel in the guidance editor
         /*if (guidancemodel.isGuidanceEditor()) {
@@ -62,10 +62,6 @@ requirejs([
             palette.addTool(new EdgeShapeNodeTool());
 
 
-            var sep = new Separator();
-            palette.addSeparator(sep);
-            sep.get$node().hide();
-
             var viewObjectTool = new ViewObjectNodeTool();
             palette.addTool(viewObjectTool);
             viewObjectTool.get$node().hide();
@@ -74,7 +70,7 @@ requirejs([
             palette.addTool(viewRelNodeTool);
             viewRelNodeTool.get$node().hide();
 
-            palette.addSeparator(new Separator());
+            palette.addSeparator();
             palette.addTool(new BiDirAssociationEdgeTool());
             palette.addTool(new UniDirAssociationEdgeTool());
             palette.addTool(new GeneralisationEdgeTool());

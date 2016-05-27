@@ -33,8 +33,7 @@ define(['jqueryui','yjs'],function ($) {
             },
             sourceDir: 'http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor'
         }).then(function (y) {
-            window.y = y;
-            deferred.resolve();
+            deferred.resolve(y);
         });
         return deferred.promise();
     };
