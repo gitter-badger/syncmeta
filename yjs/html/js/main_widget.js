@@ -9,6 +9,7 @@ requirejs([
     'iwcw',
     'lib/yjs-sync',
     'Util',
+    'operations/non_ot/NonOTOperation',
     'operations/non_ot/ToolSelectOperation',
     'operations/non_ot/ActivityOperation',
     'operations/non_ot/JoinOperation',
@@ -51,7 +52,7 @@ requirejs([
     'canvas_widget/HistoryManager',
     'promise!Space'
     //'promise!Guidancemodel'
-],function($,jsPlumb,IWCW, yjsSync,Util,ToolSelectOperation,ActivityOperation,JoinOperation, ViewInitOperation, UpdateViewListOperation, DeleteViewOperation,SetViewTypesOperation, InitModelTypesOperation, SetModelAttributeNodeOperation, Canvas,EntityManager,NodeTool,ObjectNodeTool,AbstractClassNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,EdgeTool,GeneralisationEdgeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,ObjectNode,AbstractClassNode,RelationshipNode,RelationshipGroupNode,EnumNode,NodeShapeNode,EdgeShapeNode,GeneralisationEdge,BiDirAssociationEdge,UniDirAssociationEdge, ViewObjectNode, ViewObjectNodeTool,ViewRelationshipNode, ViewRelationshipNodeTool, ViewManager, ViewGenerator, HistoryManager,space/*,guidancemodel*/) {
+],function($,jsPlumb,IWCW, yjsSync,Util,NonOTOperation,ToolSelectOperation,ActivityOperation,JoinOperation, ViewInitOperation, UpdateViewListOperation, DeleteViewOperation,SetViewTypesOperation, InitModelTypesOperation, SetModelAttributeNodeOperation, Canvas,EntityManager,NodeTool,ObjectNodeTool,AbstractClassNodeTool,RelationshipNodeTool,RelationshipGroupNodeTool,EnumNodeTool,NodeShapeNodeTool,EdgeShapeNodeTool,EdgeTool,GeneralisationEdgeTool,BiDirAssociationEdgeTool,UniDirAssociationEdgeTool,ObjectNode,AbstractClassNode,RelationshipNode,RelationshipGroupNode,EnumNode,NodeShapeNode,EdgeShapeNode,GeneralisationEdge,BiDirAssociationEdge,UniDirAssociationEdge, ViewObjectNode, ViewObjectNodeTool,ViewRelationshipNode, ViewRelationshipNodeTool, ViewManager, ViewGenerator, HistoryManager,space/*,guidancemodel*/) {
 
     var _iwcw;
     _iwcw = IWCW.getInstance(CONFIG.WIDGET.NAME.MAIN);
@@ -79,10 +80,11 @@ requirejs([
     function InitMainWidget(metamodel, model) {
 
         EntityManager.init(metamodel);
-
+        var userList = [];
         var canvas = new Canvas($("#canvas"));
         y.share.join.observe(function(event){
-            var activityOperation;
+            //var activityOperation;
+            userList.push(event.name);
             if(!event.value && event.name !== _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]){
                 y.share.join.set(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID], true);
             }else if(event.name === _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID] && !event.value){
@@ -91,8 +93,9 @@ requirejs([
                     _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, op.toNonOTOperation());
                     _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, op.toNonOTOperation());
                 }
-                //TODO
-                //_iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.toNonOTOperation());
+
+                var joinOperation = new JoinOperation(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID],true, y.db.userId);
+                _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, joinOperation.toNonOTOperation());
                 if(model)
                     JSONtoGraph(model).done(function(stats){
                         console.info(stats);
@@ -113,19 +116,14 @@ requirejs([
                         _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, new SetModelAttributeNodeOperation().toNonOTOperation());
                     }
                     else if (operation instanceof UpdateViewListOperation) {
-                        y.share.views.set(UpdateViewListOperation.TYPE, null);
+                        y.share.canvas.set(UpdateViewListOperation.TYPE, true);
+                    }
+                    else if(operation.getType() === 'WaitForCanvasOperation'){
+                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, new NonOTOperation('WaitForCanvasOperation', JSON.stringify(userList)));
                     }
                 });
-                y.share.views.observe(function(event){
-                    switch (event.name){
-                        case UpdateViewListOperation.TYPE:{
-                            if (metamodel.constructor === Object) {
-                                ViewManager.GetViewpointList();
-                            } else {
-                                ViewManager.initViewList();
-                            }
-                        }
-                    }
+                y.share.canvas.observePath([UpdateViewListOperation.TYPE],function(){
+                    ViewManager.GetViewpointList();
                 });
 
 
@@ -136,14 +134,14 @@ requirejs([
                 }
                 canvas.resetTool();
             }
-            activityOperation = new ActivityOperation(
+            /*activityOperation = new ActivityOperation(
                 "UserJoinActivity",
                 "-1",
                 event.name,
                 "",
                 {}
             ).toNonOTOperation();
-            _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);
+            _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation);*/
         });
         /*
          if (guidancemodel.isGuidanceEditor()) {
@@ -208,36 +206,30 @@ requirejs([
             $('#btnShowView').click(function () {
                 //Get identifier of the current selected view
                 var viewId = ViewManager.getViewIdOfSelected();
-                if (viewId === $('#lblCurrentView').text())
+                var $currentViewIdLabel = $('#lblCurrentViewId');
+                if (viewId === $currentViewIdLabel.text())
                     return;
-                var resource = ViewManager.getViewpointResourceFromViewId(viewId);
-                if (resource != null) {
-                    resource.getRepresentation('rdfjson', function (vvs) {
-                        //initialize the new node- and edge types for the EntityManager
-                        EntityManager.initViewTypes(vvs);
 
-                        //send the new tools to the palette as well
-                        var operation = new InitModelTypesOperation(vvs, true).toNonOTOperation();
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, operation);
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation);
+                var vvs = y.share.views.get(viewId);
+                EntityManager.initViewTypes(vvs);
 
-                        var activityOperation = new ActivityOperation("ViewApplyActivity", vvs.id, _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation.toNonOTOperation());
-                        //TODO
-                        //_iwcw.sendRemoteNonOTOperation(activityOperation.toNonOTOperation());
+                //send the new tools to the palette as well
+                var operation = new InitModelTypesOperation(vvs, true).toNonOTOperation();
+                _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, operation);
+                _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation);
 
-                        //init the tools for canvas
-                        initTools(vvs);
+                var activityOperation = new ActivityOperation("ViewApplyActivity", vvs.id, _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
+                _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation.toNonOTOperation());
 
-                        ViewManager.getViewpointData(viewId).done(function (vvs) {
-                            ViewGenerator.generate(metamodel, vvs);
-                        });
+                //init the tools for canvas
+                initTools(vvs);
+                ViewGenerator.generate(metamodel, vvs);
 
-                        $('#lblCurrentView').show();
-                        $('#lblCurrentViewId').text(viewId);
+                $('#lblCurrentView').show();
+                $currentViewIdLabel.text(viewId);
 
-                    });
-                }
+                //});
+                //}
 
             });
 
@@ -327,14 +319,12 @@ requirejs([
             $('#btnDelViewPoint').click(function () {
                 var viewId = ViewManager.getViewIdOfSelected();
                 if (viewId !== $('#lblCurrentViewId').text()) {
-                    openapp.resource.del(ViewManager.getViewUri(viewId), function () {
-                        ViewManager.deleteView(viewId);
-                        //TODO DeleteView Operation
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, new DeleteViewOperation(viewId).toNonOTOperation());
-                    });
+                    y.share.views.set(viewId, null);
+                    _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, new DeleteViewOperation(viewId).toNonOTOperation());
+
                 }
                 else {
-                    DeleteView(viewId);
+                    y.share.views.set(viewId, null);
                     $('#viewsHide').click();
                 }
             });
@@ -345,19 +335,15 @@ requirejs([
                     alert('View already exists');
                     return;
                 }
+                var $loading = $('#loading');
+                $loading.show();
                 resetCanvas();
+                $('#lblCurrentView').show();
                 $('#lblCurrentViewId').text(viewId);
-                ViewManager.storeView(viewId, null).then(function (resp) {
-                    ViewManager.addView(viewId, null, resp);
-                    visualizeView(viewId);
-
-                    //TODO
-                    //var operation = new UpdateViewListOperation();
-                    //_iwcw.sendRemoteNonOTOperation(operation.toNonOTOperation());
-
-                    canvas.get$canvas().show();
-                    HideCreateMenu();
-                });
+                canvas.get$canvas().show();
+                HideCreateMenu();
+                y.share.canvas.set(UpdateViewListOperation.TYPE, true);
+                $loading.hide();
             });
 
             //Meta-modelling layer implementation
@@ -370,26 +356,27 @@ requirejs([
                 if ($lblCurrentViewId.text().length > 0) {
                     var $loading = $("#loading");
                     $loading.show();
-                    Util.GetCurrentBaseModel().done(function (model) {
-                        //Disable the view types in the palette
-                        var operation = new SetViewTypesOperation(false);
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, operation.toNonOTOperation());
-                        var activityOperation = new ActivityOperation("ViewApplyActivity", '', _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
-                        _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation.toNonOTOperation());
 
-                        //TODO
-                        //_iwcw.sendRemoteNonOTOperation(activityOperation.toNonOTOperation());
+                    var model = y.share.data.get('model');
+                    //Disable the view types in the palette
+                    var operation = new SetViewTypesOperation(false);
+                    _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.PALETTE, operation.toNonOTOperation());
+                    var activityOperation = new ActivityOperation("ViewApplyActivity", '', _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
+                    _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation.toNonOTOperation());
 
-                        resetCanvas();
-                        JSONtoGraph(model);
+                    //TODO
+                    //_iwcw.sendRemoteNonOTOperation(activityOperation.toNonOTOperation());
+
+                    resetCanvas();
+                    JSONtoGraph(model).done(function(){
+                        $("#loading").hide();
                         canvas.resetTool();
-                        $('#lblCurrentView').hide();
-                        $lblCurrentViewId.text("");
-                        EntityManager.setViewId(null);
-                        $loading.hide();
-                    })
+                    });
+                    $('#lblCurrentView').hide();
+                    $lblCurrentViewId.text("");
+                    EntityManager.setViewId(null);
                 }
-            });
+            })
         }
 
         //Functions and Callbacks for the view-based modeling approach
@@ -435,21 +422,24 @@ requirejs([
 
         }
 
-        var visualizeView = function (viewId, viewpointData) {
-            ViewManager.getViewResource(viewId).getRepresentation('rdfjson', function (viewData) {
+        var visualizeView = function (viewId) {
+            //ViewManager.getViewResource(viewId).getRepresentation('rdfjson', function (viewData) {
+            var viewData = y.share.views.get(viewId);
+            if(viewData) {
                 resetCanvas();
-                ViewToGraph(viewData, viewpointData);
+                ViewToGraph(viewData);
                 $('#lblCurrentView').show();
                 $('#lblCurrentViewId').text(viewData.id);
                 EntityManager.setViewId(viewData.id);
                 canvas.resetTool();
-                $("#loading").hide();
-            });
+
+            }
+            //});
         };
 
-        function ViewToGraph(json, viewpoint) {
+        function ViewToGraph(json) {
             //Initialize the attribute widget
-            var operation = new ViewInitOperation(json, viewpoint);
+            var operation = new ViewInitOperation(json);
             _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, operation.toNonOTOperation());
 
             //Enable the view types in the palette
@@ -459,19 +449,12 @@ requirejs([
             var activityOperation = new ActivityOperation("ViewApplyActivity", json.id, _iwcw.getUser()[CONFIG.NS.PERSON.JABBERID]);
             _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ACTIVITY, activityOperation.toNonOTOperation());
 
-            JSONtoGraph(json);
+            JSONtoGraph(json).done(function(){
+                $("#loading").hide();
+                canvas.resetTool();
+            });
         }
 
-        function DeleteView(viewId) {
-            var deferred = $.Deferred();
-            openapp.resource.del(ViewManager.getViewUri(viewId), function () {
-                ViewManager.deleteView(viewId);
-                //TODO delete view operation
-                _iwcw.sendLocalNonOTOperation(CONFIG.WIDGET.NAME.ATTRIBUTE, new DeleteViewOperation(viewId).toNonOTOperation());
-                deferred.resolve();
-            });
-            return deferred.promise();
-        }
 
         //-------------------------------------------------------------
         var createYTextAttribute = function(map,val){
@@ -592,6 +575,23 @@ requirejs([
                                 attr = attrs[attrKey2];
                                 //promises.push(createYTextAttribute(map, attr.getValue()));
                                 createYTextAttribute(map, attr.getValue());
+                            }
+                        }
+                    }else if(jsonNode.type ==='ViewObject' || jsonNode.type === 'ViewRelationship'){
+                        attrs = node.getAttribute('[attributes]').getAttributes();
+                        for(var attrKey3 in attrs){
+                            if(attrs.hasOwnProperty(attrKey3)) {
+                                attr = attrs[attrKey3];
+                                //promises.push(createYTextAttribute(map, attr.getValue()));
+                                createYTextAttribute(map, attr.getKey());
+                            }
+                        }
+                        var conditions = node.getAttribute('[condition]').getAttributes();
+                        for(var attrKey4 in conditions){
+                            if(conditions.hasOwnProperty(attrKey4)) {
+                                attr = conditions[attrKey4];
+                                //promises.push(createYTextAttribute(map, attr.getValue()));
+                                createYTextAttribute(map, attr.getKey());
                             }
                         }
                     }
@@ -815,27 +815,19 @@ requirejs([
             $feedback.text("Saving...");
 
             var viewId = $('#lblCurrentViewId').text();
-            if (viewId.length > 0 && metamodel.constructor !== Object) {
-                ViewManager.updateViewContent(viewId, ViewManager.getResource(viewId)).then(function () {
-                    //ViewManager.initViewList();
-                    $feedback.text("Saved!");
-                    setTimeout(function () {
-                        $feedback.text("");
-                    }, 1000);
-                });
+            if (viewId.length > 0 && !metamodel) {
+                ViewManager.updateViewContent(viewId);
+                $feedback.text("Saved!");
+                setTimeout(function () {
+                    $feedback.text("");
+                }, 1000);
+
             } else {
                 y.share.data.set('model', EntityManager.graphToJSON());
                 $feedback.text("Saved!");
                 setTimeout(function () {
                     $feedback.text("");
                 }, 1000);
-                /*
-                 EntityManager.storeData().then(function () {
-                 $feedback.text("Saved!");
-                 setTimeout(function () {
-                 $feedback.text("");
-                 }, 1000);
-                 });*/
             }
 
 
@@ -921,7 +913,7 @@ requirejs([
             }
         };
 
-        ViewManager.initViewList();
+        ViewManager.GetViewpointList();
 
         //local user joins
         y.share.join.set(_iwcw.getUser()[CONFIG.NS.PERSON.JABBERID],false);
