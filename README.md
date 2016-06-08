@@ -5,7 +5,8 @@ This is gh-pages branch. It contains the (generated) web content that is deploye
 ###yjs-spaces on the role-sandbox
 * [CAE instance](http://role-sandbox.eu/spaces/yjscae)
 * [istar meta with views](http://role-sandbox.eu/spaces/yjsistar)
-* [istar isntance with views](http://role-sandbox.eu/spaces/yjsistarmodel)
+* [istar instance with views](http://role-sandbox.eu/spaces/yjsistarmodel)
+* [imsld instance with views](http://role-sandbox.eu/spaces/imsldyjsinstance)
 
 
 
